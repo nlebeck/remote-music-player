@@ -11,7 +11,7 @@ public class Server {
 	public static void main(String[] args) {
 		Server server = new Server();
 		server.printMixerInfo();
-		server.doJankyMicrophoneLoopback();
+		server.doMicrophoneLoopback();
 	}
 	
 	private void printMixerInfo() {
@@ -65,7 +65,7 @@ public class Server {
 		return dataLine;
 	}
 	
-	private void doJankyMicrophoneLoopback () {
+	private void doMicrophoneLoopback () {
 		final int BUF_SIZE = 1024;
 		
 		Mixer captureMixer = getMixerByName("Primary Sound Capture Driver");

@@ -6,6 +6,18 @@ and I'd like to be able to control what plays on the speakers using my laptop.
 There is probably some existing program that I could use to accomplish this
 task, but I thought it would be a fun little programming project.
 
+## A problem
+
+After reading these StackOverflow posts, I am starting to suspect that
+capturing audio from the sound card is not possible, at least in Java and using
+my current hardware:
+* https://stackoverflow.com/q/2869898
+* https://stackoverflow.com/q/44604880
+
+I will leave this repo up for now, in case I find a way to capture audio in the
+future, or I need to do something else with the Java sound library.
+
 ## Potentially helpful links
-https://stackoverflow.com/q/31738072
-https://stackoverflow.com/q/28122097
+* https://stackoverflow.com/q/31738072
+* https://stackoverflow.com/q/28122097
+* https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
