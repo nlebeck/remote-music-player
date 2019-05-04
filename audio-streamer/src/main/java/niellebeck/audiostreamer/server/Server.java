@@ -65,7 +65,7 @@ public class Server {
 		return dataLine;
 	}
 	
-	private void test() {
+	private void doJankyMicrophoneLoopback () {
 		final int BUF_SIZE = 1024;
 		
 		Mixer captureMixer = getMixerByName("Primary Sound Capture Driver");
