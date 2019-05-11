@@ -14,10 +14,14 @@ my current hardware:
 * https://stackoverflow.com/q/2869898
 * https://stackoverflow.com/q/44604880
 
-I will leave this repo up for now, in case I find a way to capture audio in the
-future, or I need to do something else with the Java sound library.
+For now, I think I'm going to make the program just play mp3 files and
+temporarily copy the files themselves over to the remote machine. This approach
+has the downside that I can't play songs from Apple Music or YouTube, but it's
+better than nothing.
 
 ## Potentially helpful links
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
+* https://stackoverflow.com/q/6045384
+* https://openjfx.io/openjfx-docs/
