@@ -6,7 +6,7 @@ and I'd like to be able to control what plays on the speakers using my laptop.
 There is probably some existing program that I could use to accomplish this
 task, but I thought it would be a fun little programming project.
 
-## A problem
+## A change in direction
 
 After reading these StackOverflow posts, I am starting to suspect that
 capturing audio from the sound card is not possible, at least in Java and using
@@ -14,10 +14,33 @@ my current hardware:
 * https://stackoverflow.com/q/2869898
 * https://stackoverflow.com/q/44604880
 
-For now, I think I'm going to make the program just play mp3 files and
-temporarily copy the files themselves over to the remote machine. This approach
-has the downside that I can't play songs from Apple Music or YouTube, but it's
-better than nothing.
+For now, I think I'm going to switch gears and instead make a program that
+plays locally stored mp3 files, with file selection and playback controlled by
+a web interface. This approach has the downside that I can't play songs from
+Apple Music or YouTube, but it's better than nothing, and I think it will be
+fun to design the web interface.
+
+## Using JavaFX with Maven
+
+The JavaFX documentation provides some
+[quick-start instructions][JavaFX-Maven-quickstart] for using JavaFX with Maven
+but doesn't explain the example in depth, so it took me a little while to
+figure out which bits of the example are necessary. Below are some notes about
+what I discovered.
+
+It looks like in order to have your program successfully reference JavaFX
+classes, your `pom.xml` file needs to have the `javafx-maven-plugin` plugin
+with a `mainClass` configuration element set to your program's main class, and
+you need to launch the program using `mvn javafx:run`. If you just try to run
+`mvn package` and then run the program with `java`, you'll get a
+`NoClassDefFoundError`.
+
+Furthermore, in order to use the JavaFX `MediaPlayer` class to play media, you
+need to create and use it inside of a class that extends JavaFX's `Application`
+rather than an ordinary command-line program with a `main()` method.
+Attempting the latter will give you an `IllegalStateException` saying "Toolkit
+not initialized." However, you do not have to actually create and show a
+`Scene` inside of the `Application`'s `start()` method in order to play media.
 
 ## Potentially helpful links
 * https://stackoverflow.com/q/31738072
@@ -25,3 +48,5 @@ better than nothing.
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
 * https://stackoverflow.com/q/6045384
 * https://openjfx.io/openjfx-docs/
+
+[JavaFX-Maven-quickstart]: https://openjfx.io/openjfx-docs/#maven
