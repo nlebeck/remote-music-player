@@ -41,17 +41,23 @@ public class MusicPlayer extends Application {
 
 		@Override
 		public void run() {
-			File file = new File(BASE_DIR + "\\test.mp3");
-			Media media = new Media(file.toURI().toString());
-			MediaPlayer player = new MediaPlayer(media);
-			System.out.println(player.getStatus());
-			player.play();
+			MediaPlayer player = null;
 			
 			while (true) {
-				System.out.println("Hello there");
-				System.out.println(player.getStatus());
+				String newSong = checkForSongChange();
+				if (newSong != null) {
+					if (player != null) {
+						player.stop();
+					}
+					
+					File file = new File(newSong);
+					Media media = new Media(file.toURI().toString());
+					player = new MediaPlayer(media);
+					player.play();
+				}
+				
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				}
 				catch (InterruptedException e) {
 					e.printStackTrace();
@@ -71,21 +77,83 @@ public class MusicPlayer extends Application {
 				throws IOException, ServletException {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
-			response.getWriter().println("<h1>Files</h1>");
 			
-			File baseDir = new File(BASE_DIR);
-			String[] files = baseDir.list();
-			for (String file : files) {
-				response.getWriter().println(file);
-				response.getWriter().println("<p>");
+			String currentPath = convertRelativeUrlToFilePath(target);
+			File currentFile = new File (currentPath);
+			System.out.println("Current path: " + currentPath);
+			
+			if (currentFile.isDirectory()) {
+				response.getWriter().println("<h1>" + currentPath + "</h1>");
+				
+				String[] files = currentFile.list();
+				for (String file : files) {
+					String filePath = currentFile.getAbsolutePath() + File.separator + file;
+					String relativeUrl = convertFilePathToRelativeUrl(filePath);
+					response.getWriter().println("<a href=\"" + relativeUrl + "\">" + file + "</a>");
+					response.getWriter().println("<p>");
+				}
 			}
-			
-			response.getWriter().println("<a href=\"dummy_link\">test link</a>");
+			else {
+				response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
+				changeSong(currentPath);
+			}
+		}
+		
+		private String convertRelativeUrlToFilePath(String url) {
+			String[] split = url.split("/");
+			StringBuilder sb = new StringBuilder();
+			sb.append(BASE_DIR);
+			sb.append(File.separator);
+			for (String str : split) {
+				if (!str.isEmpty()) {
+					sb.append(str);
+					sb.append(File.separator);
+				}
+			}
+			return sb.toString();
 		}
     	
+		private String convertFilePathToRelativeUrl(String filePath) {
+			if (filePath.indexOf(BASE_DIR) != 0) {
+				System.err.println("Error: file path " + filePath + " does not begin with base directory");
+				return null;
+			}
+			String relativePath = filePath.substring(BASE_DIR.length());
+			
+			String splitStr = File.separator;
+			if (File.separator.equals("\\")) {
+				splitStr = "\\\\";
+			}
+			
+			String[] split = relativePath.split(splitStr);
+			StringBuilder sb = new StringBuilder();
+			sb.append("/");
+			for (String str : split) {
+				if (!str.isEmpty()) {
+					sb.append(str);
+					sb.append("/");
+				}
+			}
+			return sb.toString();
+		}
     }
     
     private Server jettyServer;
+    private boolean pendingSongChange = false;
+    private String currentSongPath = null;
+    
+    private synchronized void changeSong(String path) {
+    	currentSongPath = path;
+    	pendingSongChange = true;
+    }
+    
+    private synchronized String checkForSongChange() {
+    	if (pendingSongChange) {
+    		pendingSongChange = false;
+    		return currentSongPath;
+    	}
+    	return null;
+    }
 	
 	public static void main(String[] args) {
 		launch();
