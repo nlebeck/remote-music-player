@@ -78,6 +78,19 @@ public class MusicPlayer extends Application {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
 			
+			// Hack to avoid attempting to change the song when receiving
+			// favicon.ico requests
+			//
+			// TODO: Think of a more principled way to avoid changing the song
+			//       whenever there is a request for a URL whose corresponding
+			//       file is not a valid sound file.
+			if (target.contains("favicon.ico")) {
+				return;
+			}
+			
+			response.getWriter().println("<html>");
+			response.getWriter().println("<body>");
+			
 			String currentPath = convertRelativeUrlToFilePath(target);
 			File currentFile = new File (currentPath);
 			System.out.println("Current path: " + currentPath);
@@ -97,6 +110,9 @@ public class MusicPlayer extends Application {
 				response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
 				changeSong(currentPath);
 			}
+			
+			response.getWriter().println("</body>");
+			response.getWriter().println("</html>");
 		}
 		
 		private String convertRelativeUrlToFilePath(String url) {
