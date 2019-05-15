@@ -57,6 +57,8 @@ public class MusicPlayer extends Application {
 		stage.setScene(scene);
 		stage.show();
 		
-		new Thread(new PlayerRunnable()).start();
+		Thread playerThread = new Thread(new PlayerRunnable());
+		playerThread.setDaemon(true);
+		playerThread.start();
 	}
 }
