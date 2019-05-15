@@ -48,5 +48,7 @@ not initialized." However, you do not have to actually create and show a
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
 * https://stackoverflow.com/q/6045384
 * https://openjfx.io/openjfx-docs/
+* https://www.eclipse.org/jetty/documentation/current/advanced-embedding.html
+* https://www.eclipse.org/jetty/documentation/current/maven-and-jetty.html
 
 [JavaFX-Maven-quickstart]: https://openjfx.io/openjfx-docs/#maven
