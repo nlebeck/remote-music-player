@@ -42,6 +42,12 @@ Attempting the latter will give you an `IllegalStateException` saying "Toolkit
 not initialized." However, you do not have to actually create and show a
 `Scene` inside of the `Application`'s `start()` method in order to play media.
 
+I would like to make an executable JAR file, but I can't figure out how to make
+one that works properly with JavaFX. It seems like there is a way to do so with
+a modular JavaFX project and jlink, but I can't get it to work. For now, I've
+created a batch script that just calls `mvn javafx:run` to launch the program
+on Windows.
+
 ## Potentially helpful links
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097
