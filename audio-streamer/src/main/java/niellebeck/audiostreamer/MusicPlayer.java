@@ -34,29 +34,29 @@ import javafx.stage.Stage;
  * By Niel Lebeck
  */
 public class MusicPlayer extends Application {
-	
+
 	private static final String BASE_DIR = "C:\\Users\\niell\\Git\\testfolder";
 	private static final String[] MUSIC_FILE_TYPES = {"mp3", "m4a"};
-	
-    private class PlayerRunnable implements Runnable {
+
+	private class PlayerRunnable implements Runnable {
 
 		@Override
 		public void run() {
 			MediaPlayer player = null;
-			
+
 			while (true) {
 				String newSong = checkForSongChange();
 				if (newSong != null) {
 					if (player != null) {
 						player.stop();
 					}
-					
+
 					File file = new File(newSong);
 					Media media = new Media(file.toURI().toString());
 					player = new MediaPlayer(media);
 					player.play();
 				}
-				
+
 				try {
 					Thread.sleep(500);
 				}
@@ -65,30 +65,30 @@ public class MusicPlayer extends Application {
 				}
 			}
 		}
-    	
-    }
-    
-    private class TestHandler extends AbstractHandler {
+
+	}
+
+	private class TestHandler extends AbstractHandler {
 
 		@Override
 		public void handle(String target,
-						   Request baseRequest,
-						   HttpServletRequest request,
-						   HttpServletResponse response)
-				throws IOException, ServletException {
+				Request baseRequest,
+				HttpServletRequest request,
+				HttpServletResponse response)
+						throws IOException, ServletException {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
-			
+
 			response.getWriter().println("<html>");
 			response.getWriter().println("<body>");
-			
+
 			String currentPath = convertRelativeUrlToFilePath(target);
 			File currentFile = new File (currentPath);
 			System.out.println("Current path: " + currentPath);
-			
+
 			if (currentFile.isDirectory()) {
 				response.getWriter().println("<h1>" + currentPath + "</h1>");
-				
+
 				String[] files = currentFile.list();
 				for (String file : files) {
 					String filePath = currentFile.getAbsolutePath() + File.separator + file;
@@ -109,11 +109,11 @@ public class MusicPlayer extends Application {
 					response.getWriter().println("<h1>File " + currentPath + " is not a valid music file</h1>");
 				}
 			}
-			
+
 			response.getWriter().println("</body>");
 			response.getWriter().println("</html>");
 		}
-		
+
 		private boolean isMusicFile(String fileName) {
 			String[] split = fileName.split("\\.");
 			String fileType = split[split.length - 1];
@@ -124,7 +124,7 @@ public class MusicPlayer extends Application {
 			}
 			return false;
 		}
-		
+
 		private String convertRelativeUrlToFilePath(String url) {
 			String[] split = url.split("/");
 			StringBuilder sb = new StringBuilder();
@@ -141,19 +141,19 @@ public class MusicPlayer extends Application {
 			}
 			return sb.toString();
 		}
-    	
+
 		private String convertFilePathToRelativeUrl(String filePath) {
 			if (filePath.indexOf(BASE_DIR) != 0) {
 				System.err.println("Error: file path " + filePath + " does not begin with base directory");
 				return null;
 			}
 			String relativePath = filePath.substring(BASE_DIR.length());
-			
+
 			String splitStr = File.separator;
 			if (File.separator.equals("\\")) {
 				splitStr = "\\\\";
 			}
-			
+
 			String[] split = relativePath.split(splitStr);
 			StringBuilder sb = new StringBuilder();
 			sb.append("/");
@@ -168,25 +168,25 @@ public class MusicPlayer extends Application {
 			}
 			return sb.toString();
 		}
-    }
-    
-    private Server jettyServer;
-    private boolean pendingSongChange = false;
-    private String currentSongPath = null;
-    
-    private synchronized void changeSong(String path) {
-    	currentSongPath = path;
-    	pendingSongChange = true;
-    }
-    
-    private synchronized String checkForSongChange() {
-    	if (pendingSongChange) {
-    		pendingSongChange = false;
-    		return currentSongPath;
-    	}
-    	return null;
-    }
-	
+	}
+
+	private Server jettyServer;
+	private boolean pendingSongChange = false;
+	private String currentSongPath = null;
+
+	private synchronized void changeSong(String path) {
+		currentSongPath = path;
+		pendingSongChange = true;
+	}
+
+	private synchronized String checkForSongChange() {
+		if (pendingSongChange) {
+			pendingSongChange = false;
+			return currentSongPath;
+		}
+		return null;
+	}
+
 	public static void main(String[] args) {
 		launch();
 	}
@@ -197,7 +197,7 @@ public class MusicPlayer extends Application {
 		Scene scene = new Scene(new StackPane(label), 640, 480);
 		stage.setScene(scene);
 		stage.show();
-		
+
 		jettyServer = new Server(8080);
 		jettyServer.setHandler(new TestHandler());
 		try {
@@ -205,12 +205,12 @@ public class MusicPlayer extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		Thread playerThread = new Thread(new PlayerRunnable());
 		playerThread.setDaemon(true);
 		playerThread.start();
 	}
-	
+
 	@Override
 	public void stop() {
 		try {
