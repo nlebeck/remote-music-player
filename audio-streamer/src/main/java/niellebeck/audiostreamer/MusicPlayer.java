@@ -2,6 +2,8 @@ package niellebeck.audiostreamer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -78,40 +80,84 @@ public class MusicPlayer extends Application {
 						throws IOException, ServletException {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
+			
+			System.out.println("Received request; target = " + target + ", query string = " + baseRequest.getQueryString());
 
-			response.getWriter().println("<html>");
-			response.getWriter().println("<body>");
-
-			String currentPath = convertRelativeUrlToFilePath(target);
-			File currentFile = new File (currentPath);
-			System.out.println("Current path: " + currentPath);
-
-			if (currentFile.isDirectory()) {
-				response.getWriter().println("<h1>" + currentPath + "</h1>");
-
-				String[] files = currentFile.list();
-				for (String file : files) {
-					String filePath = currentFile.getAbsolutePath() + File.separator + file;
-					String relativeUrl = convertFilePathToRelativeUrl(filePath);
-					response.getWriter().println("<a href=\"" + relativeUrl + "\">" + file + "</a>");
-					response.getWriter().println("<p>");
+			Map<String, String> queryParams = parseQueryString(baseRequest.getQueryString());
+			String action = queryParams.get("action");
+			if (action != null) {
+				if (action.equals("navigate")) {
+					String qpTarget = queryParams.get("target");
+					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + qpTarget;
+					File targetFile = new File(targetPath);
+					if (targetFile.isDirectory()) {
+						currentRelativeDir = currentRelativeDir + File.separator + qpTarget;
+					}
+				}
+				else if (action.equals("navigateUp")) {
+					if (!currentRelativeDir.equals("")) {
+						File currentDirFile = new File(BASE_DIR + File.separator + currentRelativeDir);
+						String parentDir = currentDirFile.getParent();
+						String parentRelativeDir = parentDir.substring(BASE_DIR.length());
+						currentRelativeDir = parentRelativeDir;
+					}
+				}
+				else if (action.equals("play")) {
+					String qpTarget = queryParams.get("target");
+					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + qpTarget;
+					if (isMusicFile(targetPath)) {
+						changeSong(targetPath);
+					}
 				}
 			}
-			else {
-				if (!currentFile.exists()) {
-					response.getWriter().println("<h1>File " + currentPath + " does not exist</h1>");
+			
+			response.getWriter().println("<html>");
+			response.getWriter().println("<body>");
+			response.getWriter().println("<h1>Current directory: " + currentRelativeDir + "</h1>");
+			
+			if (!currentRelativeDir.equals("")) {
+				response.getWriter().println("<a href=\"/?action=navigateUp\">Up</a>");
+				response.getWriter().println("<p>");
+			}
+			
+			File currentDirFile = new File(BASE_DIR + File.separator + currentRelativeDir);
+			String[] children = currentDirFile.list();
+			for (String child : children) {
+				String childPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + child;
+				File childFile = new File(childPath);
+				String linkedAction = null;
+				if (childFile.isDirectory()) {
+					linkedAction = "navigate";
 				}
-				else if (isMusicFile(currentPath)) {
-					response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
-					changeSong(currentPath);
+				else if (isMusicFile(childPath) && childFile.exists()) {
+					linkedAction = "play";
 				}
-				else {
-					response.getWriter().println("<h1>File " + currentPath + " is not a valid music file</h1>");
+				if (linkedAction != null) {
+					response.getWriter().println("<a href=\"/?action=" + linkedAction + "&target=" + child + "\">" + child + "</a>");
 				}
+				response.getWriter().println("<p>");
 			}
 
 			response.getWriter().println("</body>");
 			response.getWriter().println("</html>");
+		}
+		
+		private Map<String, String> parseQueryString(String queryString) {
+			if (queryString == null) {
+				return new HashMap<String, String>();
+			}
+			
+			Map<String, String> result = new HashMap<String, String>();
+			String[] split = queryString.split("&");
+			for(String kvPair : split) {
+				String[] kvPairSplit = kvPair.split("=");
+				if (kvPairSplit.length == 2) {
+					String key = kvPairSplit[0];
+					String value = kvPairSplit[1];
+					result.put(key, value);
+				}
+			}
+			return result;
 		}
 
 		private boolean isMusicFile(String fileName) {
@@ -124,55 +170,21 @@ public class MusicPlayer extends Application {
 			}
 			return false;
 		}
-
-		private String convertRelativeUrlToFilePath(String url) {
-			String[] split = url.split("/");
-			StringBuilder sb = new StringBuilder();
-			sb.append(BASE_DIR);
-			sb.append(File.separator);
-			for (int i = 0; i < split.length; i++) {
-				String str = split[i];
-				if (!str.isEmpty()) {
-					sb.append(str);
-					if (i < split.length - 1) {
-						sb.append(File.separator);
-					}
-				}
-			}
-			return sb.toString();
-		}
-
-		private String convertFilePathToRelativeUrl(String filePath) {
-			if (filePath.indexOf(BASE_DIR) != 0) {
-				System.err.println("Error: file path " + filePath + " does not begin with base directory");
-				return null;
-			}
-			String relativePath = filePath.substring(BASE_DIR.length());
-
-			String splitStr = File.separator;
-			if (File.separator.equals("\\")) {
-				splitStr = "\\\\";
-			}
-
-			String[] split = relativePath.split(splitStr);
-			StringBuilder sb = new StringBuilder();
-			sb.append("/");
-			for (int i = 0; i < split.length; i++) {
-				String str = split[i];
-				if (!str.isEmpty()) {
-					sb.append(str);
-					if (i < split.length - 1) {
-						sb.append("/");
-					}
-				}
-			}
-			return sb.toString();
-		}
 	}
 
 	private Server jettyServer;
+	
+	/*
+	 * Accessed by both the Jetty server and the MediaPlayer thread, and
+	 * accessed only inside synchronized MusicPlayer methods
+	 */
 	private boolean pendingSongChange = false;
 	private String currentSongPath = null;
+	
+	/*
+	 * Accessed by only the Jetty server
+	 */
+	private String currentRelativeDir = "";
 
 	private synchronized void changeSong(String path) {
 		currentSongPath = path;
