@@ -36,6 +36,7 @@ import javafx.stage.Stage;
 public class MusicPlayer extends Application {
 	
 	private static final String BASE_DIR = "C:\\Users\\niell\\Git\\testfolder";
+	private static final String[] MUSIC_FILE_TYPES = {"mp3", "m4a"};
 	
     private class PlayerRunnable implements Runnable {
 
@@ -78,16 +79,6 @@ public class MusicPlayer extends Application {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
 			
-			// Hack to avoid attempting to change the song when receiving
-			// favicon.ico requests
-			//
-			// TODO: Think of a more principled way to avoid changing the song
-			//       whenever there is a request for a URL whose corresponding
-			//       file is not a valid sound file.
-			if (target.contains("favicon.ico")) {
-				return;
-			}
-			
 			response.getWriter().println("<html>");
 			response.getWriter().println("<body>");
 			
@@ -107,12 +98,28 @@ public class MusicPlayer extends Application {
 				}
 			}
 			else {
-				response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
-				changeSong(currentPath);
+				if (isMusicFile(currentPath)) {
+					response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
+					changeSong(currentPath);
+				}
+				else {
+					response.getWriter().println("<h1>File " + currentPath + " is not a valid music file</h1>");
+				}
 			}
 			
 			response.getWriter().println("</body>");
 			response.getWriter().println("</html>");
+		}
+		
+		private boolean isMusicFile(String fileName) {
+			String[] split = fileName.split("\\.");
+			String fileType = split[split.length - 1];
+			for (String type : MUSIC_FILE_TYPES) {
+				if (fileType.equalsIgnoreCase(type)) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		private String convertRelativeUrlToFilePath(String url) {
