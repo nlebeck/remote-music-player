@@ -120,10 +120,13 @@ public class MusicPlayer extends Application {
 			StringBuilder sb = new StringBuilder();
 			sb.append(BASE_DIR);
 			sb.append(File.separator);
-			for (String str : split) {
+			for (int i = 0; i < split.length; i++) {
+				String str = split[i];
 				if (!str.isEmpty()) {
 					sb.append(str);
-					sb.append(File.separator);
+					if (i < split.length - 1) {
+						sb.append(File.separator);
+					}
 				}
 			}
 			return sb.toString();
@@ -144,10 +147,13 @@ public class MusicPlayer extends Application {
 			String[] split = relativePath.split(splitStr);
 			StringBuilder sb = new StringBuilder();
 			sb.append("/");
-			for (String str : split) {
+			for (int i = 0; i < split.length; i++) {
+				String str = split[i];
 				if (!str.isEmpty()) {
 					sb.append(str);
-					sb.append("/");
+					if (i < split.length - 1) {
+						sb.append("/");
+					}
 				}
 			}
 			return sb.toString();
