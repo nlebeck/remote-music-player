@@ -2,6 +2,8 @@ package niellebeck.audiostreamer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,10 +90,11 @@ public class MusicPlayer extends Application {
 			if (action != null) {
 				if (action.equals("navigate")) {
 					String qpTarget = queryParams.get("target");
-					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + qpTarget;
+					String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
+					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + decodedTarget;
 					File targetFile = new File(targetPath);
 					if (targetFile.isDirectory()) {
-						currentRelativeDir = currentRelativeDir + File.separator + qpTarget;
+						currentRelativeDir = currentRelativeDir + File.separator + decodedTarget;
 					}
 				}
 				else if (action.equals("navigateUp")) {
@@ -104,7 +107,8 @@ public class MusicPlayer extends Application {
 				}
 				else if (action.equals("play")) {
 					String qpTarget = queryParams.get("target");
-					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + qpTarget;
+					String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
+					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + decodedTarget;
 					if (isMusicFile(targetPath)) {
 						changeSong(targetPath);
 					}
@@ -133,7 +137,8 @@ public class MusicPlayer extends Application {
 					linkedAction = "play";
 				}
 				if (linkedAction != null) {
-					response.getWriter().println("<a href=\"/?action=" + linkedAction + "&target=" + child + "\">" + child + "</a>");
+					String encodedChild = URLEncoder.encode(child, "UTF-8");
+					response.getWriter().println("<a href=\"/?action=" + linkedAction + "&target=" + encodedChild + "\">" + child + "</a>");
 				}
 				response.getWriter().println("<p>");
 			}
