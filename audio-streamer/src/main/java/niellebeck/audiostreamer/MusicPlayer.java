@@ -98,7 +98,10 @@ public class MusicPlayer extends Application {
 				}
 			}
 			else {
-				if (isMusicFile(currentPath)) {
+				if (!currentFile.exists()) {
+					response.getWriter().println("<h1>File " + currentPath + " does not exist</h1>");
+				}
+				else if (isMusicFile(currentPath)) {
 					response.getWriter().println("<h1>Playing file " + currentPath + "</h1>");
 					changeSong(currentPath);
 				}
