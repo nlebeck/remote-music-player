@@ -223,8 +223,9 @@ public class MusicPlayer extends Application {
 		ConfigFileParser config = new ConfigFileParser(CONFIG_FILE_NAME);
 		baseDir = config.getBaseDir();
 		musicFileTypes = config.getMusicFileTypes();
+		int port = config.getPort();
 
-		jettyServer = new Server(8080);
+		jettyServer = new Server(port);
 		jettyServer.setHandler(new TestHandler());
 		try {
 			jettyServer.start();

@@ -48,4 +48,11 @@ public class ConfigFileParser {
 				.getTextContent();
 		return typesString.split(",");
 	}
+	
+	public int getPort() {
+		String portString = configFileDoc.getElementsByTagName("port")
+				.item(0)
+				.getTextContent();
+		return Integer.parseInt(portString);
+	}
 }
