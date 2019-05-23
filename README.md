@@ -1,24 +1,11 @@
-# AudioStreamer
-I am planning to write a simple app to capture the audio from one computer and
-stream it to another computer to be played. My use case is very simple: I have
-a desktop PC hooked up to speakers and a laptop on the other side of the room,
-and I'd like to be able to control what plays on the speakers using my laptop.
-There is probably some existing program that I could use to accomplish this
-task, but I thought it would be a fun little programming project.
+# Remote Music Player
 
-## A change in direction
-
-After reading these StackOverflow posts, I am starting to suspect that
-capturing audio from the sound card is not possible, at least in Java and using
-my current hardware:
-* https://stackoverflow.com/q/2869898
-* https://stackoverflow.com/q/44604880
-
-For now, I think I'm going to switch gears and instead make a program that
-plays locally stored mp3 files, with file selection and playback controlled by
-a web interface. This approach has the downside that I can't play songs from
-Apple Music or YouTube, but it's better than nothing, and I think it will be
-fun to design the web interface.
+This program is a music player that can be controlled remotely via a web
+interface. My use case is very simple: I have a desktop PC hooked up to a TV
+and speakers, and I'd like to be able to control what plays on the speakers
+using my laptop or cell phone. There is probably some existing program that I
+could use to accomplish this task, but I thought it would be a fun little
+programming project.
 
 ## Using JavaFX with Maven
 
@@ -47,6 +34,22 @@ one that works properly with JavaFX. It seems like there is a way to do so with
 a modular JavaFX project and jlink, but I can't get it to work. For now, I've
 created a batch script that just calls `mvn javafx:run` to launch the program
 on Windows.
+
+## Project history
+
+Originally, I wanted to write an app that would capture audio from one computer
+and stream it to another computer (so that I could capture audio on my laptop
+and stream it to my desktop). However, after reading these StackOverflow posts,
+I began to suspect that capturing audio from the sound card is not possible, at
+least in Java and using my current hardware:
+* https://stackoverflow.com/q/2869898
+* https://stackoverflow.com/q/44604880
+
+As a result, I switched gears to make a program that plays locally stored mp3
+files, with file selection and playback controlled by a web interface. This
+approach has the downside that I can't play songs from Apple Music or YouTube,
+but it has the advantage of supporting a wider range of client devices, like a
+smartphone or tablet.
 
 ## Potentially helpful links
 * https://stackoverflow.com/q/31738072
