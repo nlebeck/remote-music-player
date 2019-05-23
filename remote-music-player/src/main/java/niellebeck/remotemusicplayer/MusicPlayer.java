@@ -39,8 +39,7 @@ import javafx.stage.Stage;
  */
 public class MusicPlayer extends Application {
 
-	private static final String BASE_DIR = "C:\\Users\\niell\\Git\\testfolder";
-	private static final String[] MUSIC_FILE_TYPES = {"mp3", "m4a"};
+	private static final String CONFIG_FILE_NAME = "config.xml";
 
 	private class PlayerRunnable implements Runnable {
 
@@ -91,7 +90,7 @@ public class MusicPlayer extends Application {
 				if (action.equals("navigate")) {
 					String qpTarget = queryParams.get("target");
 					String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
-					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + decodedTarget;
+					String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + decodedTarget;
 					File targetFile = new File(targetPath);
 					if (targetFile.isDirectory()) {
 						currentRelativeDir = currentRelativeDir + File.separator + decodedTarget;
@@ -99,16 +98,16 @@ public class MusicPlayer extends Application {
 				}
 				else if (action.equals("navigateUp")) {
 					if (!currentRelativeDir.equals("")) {
-						File currentDirFile = new File(BASE_DIR + File.separator + currentRelativeDir);
+						File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
 						String parentDir = currentDirFile.getParent();
-						String parentRelativeDir = parentDir.substring(BASE_DIR.length());
+						String parentRelativeDir = parentDir.substring(baseDir.length());
 						currentRelativeDir = parentRelativeDir;
 					}
 				}
 				else if (action.equals("play")) {
 					String qpTarget = queryParams.get("target");
 					String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
-					String targetPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + decodedTarget;
+					String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + decodedTarget;
 					if (isMusicFile(targetPath)) {
 						changeSong(targetPath);
 					}
@@ -124,10 +123,10 @@ public class MusicPlayer extends Application {
 				response.getWriter().println("<p>");
 			}
 			
-			File currentDirFile = new File(BASE_DIR + File.separator + currentRelativeDir);
+			File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
 			String[] children = currentDirFile.list();
 			for (String child : children) {
-				String childPath = BASE_DIR + File.separator + currentRelativeDir + File.separator + child;
+				String childPath = baseDir + File.separator + currentRelativeDir + File.separator + child;
 				File childFile = new File(childPath);
 				String linkedAction = null;
 				if (childFile.isDirectory()) {
@@ -168,7 +167,7 @@ public class MusicPlayer extends Application {
 		private boolean isMusicFile(String fileName) {
 			String[] split = fileName.split("\\.");
 			String fileType = split[split.length - 1];
-			for (String type : MUSIC_FILE_TYPES) {
+			for (String type : musicFileTypes) {
 				if (fileType.equalsIgnoreCase(type)) {
 					return true;
 				}
@@ -190,6 +189,12 @@ public class MusicPlayer extends Application {
 	 * Accessed by only the Jetty server
 	 */
 	private String currentRelativeDir = "";
+	
+	/*
+	 * Assigned once at startup and never modified again
+	 */
+	private String baseDir;
+	private String[] musicFileTypes;
 
 	private synchronized void changeSong(String path) {
 		currentSongPath = path;
@@ -214,6 +219,10 @@ public class MusicPlayer extends Application {
 		Scene scene = new Scene(new StackPane(label), 640, 480);
 		stage.setScene(scene);
 		stage.show();
+		
+		ConfigFileParser config = new ConfigFileParser(CONFIG_FILE_NAME);
+		baseDir = config.getBaseDir();
+		musicFileTypes = config.getMusicFileTypes();
 
 		jettyServer = new Server(8080);
 		jettyServer.setHandler(new TestHandler());
