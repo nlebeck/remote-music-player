@@ -1,4 +1,4 @@
-package niellebeck.audiostreamer.server;
+package niellebeck.remotemusicplayer.old;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Line;

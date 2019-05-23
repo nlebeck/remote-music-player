@@ -1,4 +1,4 @@
-package niellebeck.audiostreamer.client;
+package niellebeck.remotemusicplayer.old;
 
 import java.awt.Dimension;
 

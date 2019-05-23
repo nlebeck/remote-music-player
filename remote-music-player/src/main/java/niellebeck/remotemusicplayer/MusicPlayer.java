@@ -1,4 +1,4 @@
-package niellebeck.audiostreamer;
+package niellebeck.remotemusicplayer;
 
 import java.io.File;
 import java.io.IOException;
