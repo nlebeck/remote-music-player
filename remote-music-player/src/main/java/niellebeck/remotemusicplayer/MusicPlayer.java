@@ -43,12 +43,18 @@ public class MusicPlayer extends Application {
 
 	private class PlayerRunnable implements Runnable {
 
+		private Controller controller;
+		
+		public PlayerRunnable(Controller controller) {
+			this.controller = controller;
+		}
+		
 		@Override
 		public void run() {
 			MediaPlayer player = null;
 
 			while (true) {
-				String newSong = checkForSongChange();
+				String newSong = controller.checkForSongChange();
 				if (newSong != null) {
 					if (player != null) {
 						player.stop();
@@ -73,6 +79,12 @@ public class MusicPlayer extends Application {
 
 	private class TestHandler extends AbstractHandler {
 
+		private Controller controller;
+		
+		public TestHandler(Controller controller) {
+			this.controller = controller;
+		}
+		
 		@Override
 		public void handle(String target,
 				Request baseRequest,
@@ -109,7 +121,7 @@ public class MusicPlayer extends Application {
 					String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
 					String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + decodedTarget;
 					if (isMusicFile(targetPath)) {
-						changeSong(targetPath);
+						controller.changeSong(targetPath);
 					}
 				}
 			}
@@ -177,13 +189,7 @@ public class MusicPlayer extends Application {
 	}
 
 	private Server jettyServer;
-	
-	/*
-	 * Accessed by both the Jetty server and the MediaPlayer thread, and
-	 * accessed only inside synchronized MusicPlayer methods
-	 */
-	private boolean pendingSongChange = false;
-	private String currentSongPath = null;
+	private Controller controller;
 	
 	/*
 	 * Accessed by only the Jetty server
@@ -195,19 +201,6 @@ public class MusicPlayer extends Application {
 	 */
 	private String baseDir;
 	private String[] musicFileTypes;
-
-	private synchronized void changeSong(String path) {
-		currentSongPath = path;
-		pendingSongChange = true;
-	}
-
-	private synchronized String checkForSongChange() {
-		if (pendingSongChange) {
-			pendingSongChange = false;
-			return currentSongPath;
-		}
-		return null;
-	}
 
 	public static void main(String[] args) {
 		launch();
@@ -224,16 +217,18 @@ public class MusicPlayer extends Application {
 		baseDir = config.getBaseDir();
 		musicFileTypes = config.getMusicFileTypes();
 		int port = config.getPort();
+		
+		controller = new Controller();
 
 		jettyServer = new Server(port);
-		jettyServer.setHandler(new TestHandler());
+		jettyServer.setHandler(new TestHandler(controller));
 		try {
 			jettyServer.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		Thread playerThread = new Thread(new PlayerRunnable());
+		Thread playerThread = new Thread(new PlayerRunnable(controller));
 		playerThread.setDaemon(true);
 		playerThread.start();
 	}
