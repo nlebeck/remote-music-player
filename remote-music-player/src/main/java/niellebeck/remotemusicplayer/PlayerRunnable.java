@@ -29,6 +29,16 @@ public class PlayerRunnable implements Runnable {
 				player = new MediaPlayer(media);
 				player.play();
 			}
+			else if (controller.checkForPause()) {
+				if (player != null) {
+					player.pause();
+				}
+			}
+			else if (controller.checkForUnpause()) {
+				if (player != null) {
+					player.play();
+				}
+			}
 
 			try {
 				Thread.sleep(500);

@@ -49,6 +49,12 @@ public class CustomHttpHandler extends AbstractHandler {
 				String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
 				controller.playSong(decodedTarget);
 			}
+			else if (action.equals("pause")) {
+				controller.pauseSong();
+			}
+			else if (action.equals("unpause")) {
+				controller.unpauseSong();
+			}
 		}
 		
 		response.getWriter().println("<html>");
@@ -71,6 +77,13 @@ public class CustomHttpHandler extends AbstractHandler {
 			String encodedSong = URLEncoder.encode(song, "UTF-8");
 			response.getWriter().println("<a href=\"/?action=play&target=" + encodedSong + "\">" + song + "</a>");
 			response.getWriter().println("<p>");
+		}
+		
+		if (controller.songIsPaused()) {
+			response.getWriter().println("<a href=\"/?action=unpause\">[Unpause]");
+		}
+		else {
+			response.getWriter().println("<a href=\"/?action=pause\">[Pause]");
 		}
 
 		response.getWriter().println("</body>");

@@ -10,13 +10,24 @@ import java.util.List;
  */
 public class Controller {
 
+	/*
+	 * These variables are accessed from both the Jetty server and the
+	 * PlayerRunnable threads, so they are always accessed inside synchronized
+	 * methods
+	 */
 	private boolean pendingSongChange = false;
 	private String currentSongPath = null;
-	
-	private String currentRelativeDir = "";
+	private boolean pendingPause = false;
+	private boolean pendingUnpause = false;
 	
 	/*
-	 * Assigned once at startup and never modified again
+	 * These variables are accessed only from the Jetty server thread
+	 */
+	private String currentRelativeDir = "";
+	private boolean songPaused = false;
+	
+	/*
+	 * These variables are assigned once at startup and never modified again
 	 */
 	private String baseDir;
 	private String[] musicFileTypes;
@@ -37,6 +48,36 @@ public class Controller {
 			return currentSongPath;
 		}
 		return null;
+	}
+	
+	public synchronized void pauseSong() {
+		if (!songPaused) {
+			songPaused = true;
+			pendingPause = true;
+		}
+	}
+	
+	public synchronized void unpauseSong() {
+		if (songPaused) {
+			songPaused = false;
+			pendingUnpause = true;
+		}
+	}
+	
+	public synchronized boolean checkForPause() {
+		if (pendingPause) {
+			pendingPause = false;
+			return true;
+		}
+		return false;
+	}
+	
+	public synchronized boolean checkForUnpause() {
+		if (pendingUnpause) {
+			pendingUnpause = false;
+			return true;
+		}
+		return false;
 	}
 	
 	public void navigateUp() {
@@ -61,6 +102,10 @@ public class Controller {
 		if (isMusicFile(targetPath)) {
 			changeSong(targetPath);
 		}
+	}
+	
+	public boolean songIsPaused() {
+		return songPaused;
 	}
 	
 	public String getCurrentRelativeDir() {
