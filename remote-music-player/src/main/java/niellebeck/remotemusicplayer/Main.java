@@ -44,10 +44,10 @@ public class Main extends Application {
 		String[] musicFileTypes = config.getMusicFileTypes();
 		int port = config.getPort();
 		
-		controller = new Controller();
+		controller = new Controller(baseDir, musicFileTypes);
 
 		jettyServer = new Server(port);
-		jettyServer.setHandler(new CustomHttpHandler(controller, baseDir, musicFileTypes));
+		jettyServer.setHandler(new CustomHttpHandler(controller));
 		try {
 			jettyServer.start();
 		} catch (Exception e) {

@@ -18,13 +18,13 @@ public class PlayerRunnable implements Runnable {
 		MediaPlayer player = null;
 
 		while (true) {
-			String newSong = controller.checkForSongChange();
-			if (newSong != null) {
+			String newSongPath = controller.checkForSongChange();
+			if (newSongPath != null) {
 				if (player != null) {
 					player.stop();
 				}
 
-				File file = new File(newSong);
+				File file = new File(newSongPath);
 				Media media = new Media(file.toURI().toString());
 				player = new MediaPlayer(media);
 				player.play();

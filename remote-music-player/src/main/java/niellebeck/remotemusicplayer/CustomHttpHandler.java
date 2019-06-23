@@ -1,10 +1,10 @@
 package niellebeck.remotemusicplayer;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -17,18 +17,9 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class CustomHttpHandler extends AbstractHandler {
 
 	private Controller controller;
-	private String currentRelativeDir = "";
 	
-	/*
-	 * Assigned once at startup and never modified again
-	 */
-	private String baseDir;
-	private String[] musicFileTypes;
-	
-	public CustomHttpHandler(Controller controller, String baseDir, String[] musicFileTypes) {
+	public CustomHttpHandler(Controller controller) {
 		this.controller = controller;
-		this.baseDir = baseDir;
-		this.musicFileTypes = musicFileTypes;
 	}
 	
 	@Override
@@ -48,55 +39,37 @@ public class CustomHttpHandler extends AbstractHandler {
 			if (action.equals("navigate")) {
 				String qpTarget = queryParams.get("target");
 				String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
-				String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + decodedTarget;
-				File targetFile = new File(targetPath);
-				if (targetFile.isDirectory()) {
-					currentRelativeDir = currentRelativeDir + File.separator + decodedTarget;
-				}
+				controller.navigate(decodedTarget);
 			}
 			else if (action.equals("navigateUp")) {
-				if (!currentRelativeDir.equals("")) {
-					File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
-					String parentDir = currentDirFile.getParent();
-					String parentRelativeDir = parentDir.substring(baseDir.length());
-					currentRelativeDir = parentRelativeDir;
-				}
+				controller.navigateUp();
 			}
 			else if (action.equals("play")) {
 				String qpTarget = queryParams.get("target");
 				String decodedTarget = URLDecoder.decode(qpTarget, "UTF-8");
-				String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + decodedTarget;
-				if (isMusicFile(targetPath)) {
-					controller.changeSong(targetPath);
-				}
+				controller.playSong(decodedTarget);
 			}
 		}
 		
 		response.getWriter().println("<html>");
 		response.getWriter().println("<body>");
-		response.getWriter().println("<h1>Current directory: " + currentRelativeDir + "</h1>");
+		response.getWriter().println("<h1>Current directory: " + controller.getCurrentRelativeDir() + "</h1>");
 		
-		if (!currentRelativeDir.equals("")) {
+		if (!controller.getCurrentRelativeDir().equals("")) {
 			response.getWriter().println("<a href=\"/?action=navigateUp\">Up</a>");
 			response.getWriter().println("<p>");
 		}
 		
-		File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
-		String[] children = currentDirFile.list();
-		for (String child : children) {
-			String childPath = baseDir + File.separator + currentRelativeDir + File.separator + child;
-			File childFile = new File(childPath);
-			String linkedAction = null;
-			if (childFile.isDirectory()) {
-				linkedAction = "navigate";
-			}
-			else if (isMusicFile(childPath) && childFile.exists()) {
-				linkedAction = "play";
-			}
-			if (linkedAction != null) {
-				String encodedChild = URLEncoder.encode(child, "UTF-8");
-				response.getWriter().println("<a href=\"/?action=" + linkedAction + "&target=" + encodedChild + "\">" + child + "</a>");
-			}
+		List<String> childDirs = controller.getChildDirsInCurrentDir();
+		for (String childDir : childDirs) {
+			String encodedChildDir = URLEncoder.encode(childDir, "UTF-8");
+			response.getWriter().println("<a href=\"/?action=navigate&target=" + encodedChildDir + "\">" + childDir + "</a>");
+			response.getWriter().println("<p>");
+		}
+		List<String> songs = controller.getSongsInCurrentDir();
+		for (String song : songs) {
+			String encodedSong = URLEncoder.encode(song, "UTF-8");
+			response.getWriter().println("<a href=\"/?action=play&target=" + encodedSong + "\">" + song + "</a>");
 			response.getWriter().println("<p>");
 		}
 
@@ -120,16 +93,5 @@ public class CustomHttpHandler extends AbstractHandler {
 			}
 		}
 		return result;
-	}
-
-	private boolean isMusicFile(String fileName) {
-		String[] split = fileName.split("\\.");
-		String fileType = split[split.length - 1];
-		for (String type : musicFileTypes) {
-			if (fileType.equalsIgnoreCase(type)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
