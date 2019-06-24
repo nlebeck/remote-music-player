@@ -27,6 +27,18 @@ public class PlayerRunnable implements Runnable {
 				File file = new File(newSongPath);
 				Media media = new Media(file.toURI().toString());
 				player = new MediaPlayer(media);
+				
+				/*
+				 * This StackOverflow answer told me how to detect when the
+				 * MediaPlayer is done playing a song:
+				 * https://stackoverflow.com/a/50499105.
+				 */
+				player.setOnEndOfMedia(new Runnable() {
+					public void run() {
+						controller.reportSongDone();
+					}
+				});
+				
 				player.play();
 			}
 			else if (controller.checkForPause()) {

@@ -17,8 +17,12 @@ public class Controller {
 	 */
 	private boolean pendingSongChange = false;
 	private String currentSongPath = null;
+	
 	private boolean pendingPause = false;
 	private boolean pendingUnpause = false;
+	
+	private String currentSong = "";
+	private String songRelativeDir = "";
 	
 	/*
 	 * These variables are accessed only from the Jetty server thread
@@ -37,7 +41,10 @@ public class Controller {
 		this.musicFileTypes = musicFileTypes;
 	}
 	
-	private synchronized void changeSong(String songPath) {
+	private synchronized void changeSong(String songName, String relativeDir) {
+		String songPath = baseDir + File.separator + relativeDir + File.separator + songName;
+		currentSong = songName;
+		songRelativeDir = relativeDir;
 		currentSongPath = songPath;
 		pendingSongChange = true;
 	}
@@ -80,6 +87,20 @@ public class Controller {
 		return false;
 	}
 	
+	public void reportSongDone() {
+		playNextSong();
+	}
+	
+	private synchronized void playNextSong() {
+		List<String> songs = getSongsInDir(songRelativeDir);
+		for (int i = 0; i < songs.size() - 1; i++) {
+			if (songs.get(i).equals(currentSong)) {
+				String nextSong = songs.get(i + 1);
+				changeSong(nextSong, songRelativeDir);
+			}
+		}
+	}
+	
 	public void navigateUp() {
 		if (!currentRelativeDir.equals("")) {
 			File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
@@ -98,10 +119,7 @@ public class Controller {
 	}
 	
 	public void playSong(String target) {
-		String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + target;
-		if (isMusicFile(targetPath)) {
-			changeSong(targetPath);
-		}
+		changeSong(target, currentRelativeDir);
 	}
 	
 	public boolean songIsPaused() {
@@ -113,11 +131,15 @@ public class Controller {
 	}
 	
 	public List<String> getSongsInCurrentDir() {
+		return getSongsInDir(currentRelativeDir);
+	}
+	
+	private List<String> getSongsInDir(String relativeDir) {
 		List<String> songs = new ArrayList<String>();
-		File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
+		File currentDirFile = new File(baseDir + File.separator + relativeDir);
 		String[] children = currentDirFile.list();
 		for (String child : children) {
-			String childPath = baseDir + File.separator + currentRelativeDir + File.separator + child;
+			String childPath = baseDir + File.separator + relativeDir + File.separator + child;
 			File childFile = new File(childPath);
 			if (isMusicFile(childPath) && childFile.exists()) {
 				songs.add(child);
