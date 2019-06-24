@@ -97,6 +97,7 @@ public class Controller {
 			if (songs.get(i).equals(currentSong)) {
 				String nextSong = songs.get(i + 1);
 				changeSong(nextSong, songRelativeDir);
+				break;
 			}
 		}
 	}
