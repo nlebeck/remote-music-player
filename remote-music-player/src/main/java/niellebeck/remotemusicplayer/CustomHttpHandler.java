@@ -61,8 +61,16 @@ public class CustomHttpHandler extends AbstractHandler {
 		response.getWriter().println("<body>");
 		response.getWriter().println("<h1>Current directory: " + controller.getCurrentRelativeDir() + "</h1>");
 		
+		if (controller.songIsPaused()) {
+			response.getWriter().println("<a href=\"/?action=unpause\">[Unpause]");
+		}
+		else {
+			response.getWriter().println("<a href=\"/?action=pause\">[Pause]");
+		}
+		response.getWriter().println("<p>");
+		
 		if (!controller.getCurrentRelativeDir().equals("")) {
-			response.getWriter().println("<a href=\"/?action=navigateUp\">Up</a>");
+			response.getWriter().println("<a href=\"/?action=navigateUp\">[Up]</a>");
 			response.getWriter().println("<p>");
 		}
 		
@@ -77,13 +85,6 @@ public class CustomHttpHandler extends AbstractHandler {
 			String encodedSong = URLEncoder.encode(song, "UTF-8");
 			response.getWriter().println("<a href=\"/?action=play&target=" + encodedSong + "\">" + song + "</a>");
 			response.getWriter().println("<p>");
-		}
-		
-		if (controller.songIsPaused()) {
-			response.getWriter().println("<a href=\"/?action=unpause\">[Unpause]");
-		}
-		else {
-			response.getWriter().println("<a href=\"/?action=pause\">[Pause]");
 		}
 
 		response.getWriter().println("</body>");
