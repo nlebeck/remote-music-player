@@ -7,6 +7,20 @@ using my laptop or cell phone. There is probably some existing program that I
 could use to accomplish this task, but I thought it would be a fun little
 programming project.
 
+## How to Use
+
+The program is a Maven project in the `remote-music-player` subdirectory. You
+can launch the music player by running the following command from that
+directory:
+
+    mvn clean javafx:run
+
+The music player runs an HTTP server that you can use to remotely control
+playback. It uses the port specified in `config.xml`. For example, if it is
+running on port `8080` on a computer with IP address `192.168.0.1`, then you
+can access the remote control interface by navigating a web browser to
+`http://192.168.0.1:8080`.
+
 ## Using JavaFX with Maven
 
 The JavaFX documentation provides some
