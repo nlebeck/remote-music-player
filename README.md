@@ -15,6 +15,10 @@ directory:
 
     mvn clean javafx:run
 
+In order to run the music player and play music successfully, you'll need to
+edit `config.xml` to change the `baseDir` element to contain the path of the
+top-level directory holding your music files.
+
 The music player runs an HTTP server that you can use to remotely control
 playback. It uses the port specified in `config.xml`. For example, if it is
 running on port `8080` on a computer with IP address `192.168.0.1`, then you
