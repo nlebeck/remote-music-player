@@ -47,6 +47,7 @@ public class Controller {
 		songRelativeDir = relativeDir;
 		currentSongPath = songPath;
 		pendingSongChange = true;
+		songPaused = false;
 	}
 	
 	public synchronized String checkForSongChange() {
