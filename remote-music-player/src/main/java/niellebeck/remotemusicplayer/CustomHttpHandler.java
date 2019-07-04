@@ -55,18 +55,28 @@ public class CustomHttpHandler extends AbstractHandler {
 			else if (action.equals("unpause")) {
 				controller.unpauseSong();
 			}
+			else if (action.equals("next")) {
+				controller.playNextSong();
+			}
+			else if (action.equals("prev")) {
+				controller.playPrevSong();
+			}
 		}
 		
 		response.getWriter().println("<html>");
 		response.getWriter().println("<body>");
 		response.getWriter().println("<h1>Current directory: " + controller.getCurrentRelativeDir() + "</h1>");
 		
+		response.getWriter().println("<a href=\"/?action=prev\">[Prev]");
+		response.getWriter().println(" ");
 		if (controller.songIsPaused()) {
 			response.getWriter().println("<a href=\"/?action=unpause\">[Unpause]");
 		}
 		else {
 			response.getWriter().println("<a href=\"/?action=pause\">[Pause]");
 		}
+		response.getWriter().println(" ");
+		response.getWriter().println("<a href=\"/?action=next\">[Next]");
 		response.getWriter().println("<p>");
 		
 		if (!controller.getCurrentRelativeDir().equals("")) {

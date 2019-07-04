@@ -92,12 +92,23 @@ public class Controller {
 		playNextSong();
 	}
 	
-	private synchronized void playNextSong() {
+	public synchronized void playNextSong() {
 		List<String> songs = getSongsInDir(songRelativeDir);
 		for (int i = 0; i < songs.size() - 1; i++) {
 			if (songs.get(i).equals(currentSong)) {
 				String nextSong = songs.get(i + 1);
 				changeSong(nextSong, songRelativeDir);
+				break;
+			}
+		}
+	}
+	
+	public synchronized void playPrevSong() {
+		List<String> songs = getSongsInDir(songRelativeDir);
+		for (int i = 1; i < songs.size(); i++) {
+			if (songs.get(i).equals(currentSong)) {
+				String prevSong = songs.get(i - 1);
+				changeSong(prevSong, songRelativeDir);
 				break;
 			}
 		}
