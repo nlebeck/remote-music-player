@@ -69,10 +69,14 @@ approach has the downside that I can't play songs from Apple Music or YouTube,
 but it has the advantage of supporting a wider range of client devices, like a
 smartphone or tablet.
 
-## Potentially helpful links
+## Helpful links
+
+Old project plan:
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
+
+Current incarnation of the project:
 * https://stackoverflow.com/q/6045384
 * https://openjfx.io/openjfx-docs/
 * https://www.eclipse.org/jetty/documentation/current/advanced-embedding.html
