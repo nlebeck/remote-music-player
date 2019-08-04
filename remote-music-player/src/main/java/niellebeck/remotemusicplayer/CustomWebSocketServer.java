@@ -1,10 +1,15 @@
 package niellebeck.remotemusicplayer;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+
+import com.google.gson.Gson;
 
 public class CustomWebSocketServer extends WebSocketServer {
 
@@ -23,6 +28,14 @@ public class CustomWebSocketServer extends WebSocketServer {
 		this.controller = controller;
 	}
 	
+	private String generateResponseJson() {
+		Gson gson = new Gson();
+		Map<String, List<String>> response = new HashMap<String, List<String>>();
+		response.put("songs", controller.getSongsInCurrentDir());
+		response.put("childDirs", controller.getChildDirsInCurrentDir());
+		return gson.toJson(response);
+	}
+	
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
 		
@@ -36,7 +49,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("Got message from client: " + message);
-		conn.send("Hello client!");
+		conn.send(generateResponseJson());
 	}
 
 	@Override
