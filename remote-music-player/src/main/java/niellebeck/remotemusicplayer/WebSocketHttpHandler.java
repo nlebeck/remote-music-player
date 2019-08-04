@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,14 @@ public class WebSocketHttpHandler extends AbstractHandler {
 	private static final String HTML_FILE = CLIENT_BASE_DIR + File.separator + "index.html";
 	private static final String JS_FILE = CLIENT_BASE_DIR + File.separator + "script.js";
 	
+	private String ipAddress;
+	private int webSocketPort;
+	
+	public WebSocketHttpHandler(String ipAddress, int webSocketPort) {
+		this.ipAddress = ipAddress;
+		this.webSocketPort = webSocketPort;
+	}
+	
 	@Override
 	public void handle(String target,
 			Request baseRequest,
@@ -25,23 +35,25 @@ public class WebSocketHttpHandler extends AbstractHandler {
 			HttpServletResponse response)
 					throws IOException, ServletException {
 		if (target.equals("/index.html") || target.equals("/")) {
-			respondWithFile(baseRequest, response, HTML_FILE);
+			response.setStatus(HttpServletResponse.SC_OK);
+			baseRequest.setHandled(true);
+			writeFile(HTML_FILE, response.getWriter());
 		}
 		else if (target.equals("/script.js")) {
-			respondWithFile(baseRequest, response, JS_FILE);
+			response.setStatus(HttpServletResponse.SC_OK);
+			baseRequest.setHandled(true);
+			response.getWriter().write("var ipAddress = \"" + ipAddress + "\";\n");
+			response.getWriter().write("var port = \"" + webSocketPort + "\";\n");
+			writeFile(JS_FILE, response.getWriter());
 		}
 	}
 	
-	private void respondWithFile(Request baseRequest,
-			HttpServletResponse response,
-			String filePath)
+	private void writeFile(String filePath, Writer writer)
 					throws IOException {
-		response.setStatus(HttpServletResponse.SC_OK);
-		baseRequest.setHandled(true);
 		File file = new File(filePath);
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		while (reader.ready()) {
-			response.getWriter().write(reader.readLine());
+			writer.write(reader.readLine() + "\n");
 		}
 		reader.close();
 	}
