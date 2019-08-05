@@ -13,13 +13,10 @@ import com.google.gson.Gson;
 
 public class CustomWebSocketServer extends WebSocketServer {
 
-	private static final String COMMAND_PLAY = "play";
-	private static final String COMMAND_NAVIGATE = "navigate";
-	private static final String COMMAND_NAVIGATE_UP = "navigateUp";
-	private static final String COMMAND_PAUSE = "pause";
-	private static final String COMMAND_UNPAUSE = "unpause";
-	private static final String COMMAND_NEXT = "next";
-	private static final String COMMAND_PREV = "prev";
+	private class ClientMessage {
+		public String command;
+		public String argument;
+	}
 	
 	private Controller controller;
 	
@@ -49,7 +46,25 @@ public class CustomWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("Got message from client: " + message);
-		conn.send(generateResponseJson());
+		boolean needsResponse = false;
+		Gson gson = new Gson();
+		ClientMessage clientMessage = gson.fromJson(message, ClientMessage.class);
+		switch(clientMessage.command) {
+		case "play":
+			controller.playSong(clientMessage.argument);
+			break;
+		case "navigate":
+			controller.navigate(clientMessage.argument);
+			needsResponse = true;
+			break;
+		case "connect":
+			needsResponse = true;
+			break;
+		}
+		
+		if (needsResponse) {
+			conn.send(generateResponseJson());
+		}
 	}
 
 	@Override
