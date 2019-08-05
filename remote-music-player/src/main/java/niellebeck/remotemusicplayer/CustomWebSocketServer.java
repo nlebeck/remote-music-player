@@ -18,6 +18,13 @@ public class CustomWebSocketServer extends WebSocketServer {
 		public String argument;
 	}
 	
+	private class Response {
+		public List<String> songs;
+		public List<String> childDirs;
+		public boolean paused;
+		public String currentDir;
+	}
+	
 	private Controller controller;
 	
 	public CustomWebSocketServer(Controller controller, InetSocketAddress addr) {
@@ -27,9 +34,11 @@ public class CustomWebSocketServer extends WebSocketServer {
 	
 	private String generateResponseJson() {
 		Gson gson = new Gson();
-		Map<String, List<String>> response = new HashMap<String, List<String>>();
-		response.put("songs", controller.getSongsInCurrentDir());
-		response.put("childDirs", controller.getChildDirsInCurrentDir());
+		Response response = new Response();
+		response.songs = controller.getSongsInCurrentDir();
+		response.childDirs = controller.getChildDirsInCurrentDir();
+		response.paused = controller.songIsPaused();
+		response.currentDir = controller.getCurrentRelativeDir();
 		return gson.toJson(response);
 	}
 	
@@ -56,6 +65,24 @@ public class CustomWebSocketServer extends WebSocketServer {
 		case "navigate":
 			controller.navigate(clientMessage.argument);
 			needsResponse = true;
+			break;
+		case "navigateUp":
+			controller.navigateUp();
+			needsResponse = true;
+			break;
+		case "pause":
+			controller.pauseSong();
+			needsResponse = true;
+			break;
+		case "unpause":
+			controller.unpauseSong();
+			needsResponse = true;
+			break;
+		case "prev":
+			controller.playPrevSong();
+			break;
+		case "next":
+			controller.playNextSong();
 			break;
 		case "connect":
 			needsResponse = true;

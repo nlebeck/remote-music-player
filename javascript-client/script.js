@@ -15,17 +15,66 @@ webSocket.addEventListener("message", function (event) {
 });
 
 function redrawScreen(responseJson) {
-    let navigationDiv = document.getElementById("navigation");
+    let statusDiv = document.getElementById("status");
     // Based on the following StackOverflow answer:
     // https://stackoverflow.com/a/3955238.
+    while (statusDiv.firstChild) {
+        statusDiv.removeChild(statusDiv.firstChild);
+    }
+    
+    let currentDirParagraph = document.createElement("p");
+    currentDirParagraph.innerText = "Current directory: " + responseJson.currentDir;
+    statusDiv.appendChild(currentDirParagraph);
+    
+    let controlsDiv = document.getElementById("controls");
+    while (controlsDiv.firstChild) {
+        controlsDiv.removeChild(controlsDiv.firstChild);
+    }
+    
+    let prevButton = document.createElement("button");
+    prevButton.innerText = "Prev";
+    prevButton.addEventListener("click", event => {
+        prev();
+    });
+    controlsDiv.appendChild(prevButton);
+    if (responseJson.paused) {
+        let unpauseButton = document.createElement("button");
+        unpauseButton.innerText = "Unpause";
+        unpauseButton.addEventListener("click", event => {
+            unpause();
+        });
+        controlsDiv.appendChild(unpauseButton);
+    }
+    else {
+        let pauseButton = document.createElement("button");
+        pauseButton.innerText = "Pause";
+        pauseButton.addEventListener("click", event => {
+            pause();
+        });
+        controlsDiv.appendChild(pauseButton);
+    }
+    let nextButton = document.createElement("button");
+    nextButton.innerText = "Next";
+    nextButton.addEventListener("click", event => {
+        next();
+    });
+    controlsDiv.appendChild(nextButton);
+    
+    let navigationDiv = document.getElementById("navigation");
     while (navigationDiv.firstChild) {
-        console.log(navigationDiv.firstChild);
         navigationDiv.removeChild(navigationDiv.firstChild);
     }
     
-    let navigationHeader = document.createElement("h1");
-    navigationHeader.innerText = "Navigation";
-    navigationDiv.appendChild(navigationHeader);
+    if (responseJson.currentDir != "") {
+        let upButton = document.createElement("button");
+        upButton.innerText = "Up";
+        upButton.addEventListener("click", event => {
+            navigateUp();
+        });
+        navigationDiv.appendChild(upButton);
+        navigationDiv.appendChild(document.createElement("p"));
+    }
+    
     for (let childDir of responseJson.childDirs) {
         let button = document.createElement("button");
         button.innerText = childDir;
@@ -42,9 +91,6 @@ function redrawScreen(responseJson) {
         songsDiv.removeChild(songsDiv.firstChild);
     }
     
-    let songsHeader = document.createElement("h1");
-    songsHeader.innerText = "Songs";
-    songsDiv.appendChild(songsHeader);
     for (let song of responseJson.songs) {
         let button = document.createElement("button");
         button.innerText = song;
@@ -59,6 +105,26 @@ function redrawScreen(responseJson) {
 
 function changeDir(childDir) {
     webSocket.send(JSON.stringify({ command: "navigate", argument: childDir }));
+}
+
+function navigateUp() {
+    webSocket.send(JSON.stringify({ command: "navigateUp" }));
+}
+
+function pause() {
+    webSocket.send(JSON.stringify({ command: "pause" }));
+}
+
+function unpause() {
+    webSocket.send(JSON.stringify({ command: "unpause" }));
+}
+
+function prev() {
+    webSocket.send(JSON.stringify({ command: "prev" }));
+}
+
+function next() {
+    webSocket.send(JSON.stringify({ command: "next" }));
 }
 
 function play(song) {
