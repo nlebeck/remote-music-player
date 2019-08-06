@@ -19,11 +19,12 @@ In order to run the music player and play music successfully, you'll need to
 edit `config.xml` to change the `baseDir` element to contain the path of the
 top-level directory holding your music files.
 
-The music player runs an HTTP server that you can use to remotely control
-playback. It uses the port specified in `config.xml`. For example, if it is
-running on port `8080` on a computer with IP address `192.168.0.1`, then you
-can access the remote control interface by navigating a web browser to
-`http://192.168.0.1:8080`.
+The music player provides a web interface that you can use to remotely control
+playback. It uses the ports specified in `config.xml`. To open the web
+interface, use a web browser to connect to the HTTP port listed in the config
+file. For example, if the HTTP port is set to `8080` on a computer with IP
+address `192.168.0.1`, then you can access the web interface by navigating a
+web browser to `http://192.168.0.1:8080`.
 
 ## Using JavaFX with Maven
 
@@ -71,15 +72,26 @@ smartphone or tablet.
 
 ## Helpful links
 
-Old project plan:
+Playing sound files with Java:
+* https://stackoverflow.com/q/6045384
+* https://openjfx.io/openjfx-docs/
+
+Running a Java HTTP server with embedded Jetty:
+* https://www.eclipse.org/jetty/documentation/current/advanced-embedding.html
+* https://www.eclipse.org/jetty/documentation/current/maven-and-jetty.html
+
+Using WebSockets:
+* https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+* https://github.com/TooTallNate/Java-WebSocket
+* https://stackoverflow.com/questions/37857272/invalidstateerror-on-websocket-object
+
+Using JSON:
+* https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/json
+* https://github.com/google/gson
+
+Capturing device audio (old project plan):
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
-
-Current incarnation of the project:
-* https://stackoverflow.com/q/6045384
-* https://openjfx.io/openjfx-docs/
-* https://www.eclipse.org/jetty/documentation/current/advanced-embedding.html
-* https://www.eclipse.org/jetty/documentation/current/maven-and-jetty.html
 
 [JavaFX-Maven-quickstart]: https://openjfx.io/openjfx-docs/#maven
