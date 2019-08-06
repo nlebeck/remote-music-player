@@ -1,0 +1,27 @@
+@media only screen and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+    h1 {
+        font-size: 32pt
+    }
+    
+    h2 {
+        font-size: 28pt
+    }
+    
+    p {
+        font-size: 24pt
+    }
+    
+    button {
+        font-size: 20pt
+    }
+}
+
+@media only screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+    p {
+        font-size: 16pt
+    }
+    
+    button {
+        font-size: 12pt
+    }
+}

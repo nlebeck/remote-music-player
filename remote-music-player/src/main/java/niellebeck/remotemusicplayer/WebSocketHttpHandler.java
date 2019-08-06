@@ -18,6 +18,7 @@ public class WebSocketHttpHandler extends AbstractHandler {
 
 	private static final String CLIENT_BASE_DIR = ".." + File.separator + "javascript-client";
 	private static final String HTML_FILE = CLIENT_BASE_DIR + File.separator + "index.html";
+	private static final String CSS_FILE = CLIENT_BASE_DIR + File.separator + "style.css";
 	private static final String JS_FILE = CLIENT_BASE_DIR + File.separator + "script.js";
 	
 	private String ipAddress;
@@ -38,6 +39,11 @@ public class WebSocketHttpHandler extends AbstractHandler {
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
 			writeFile(HTML_FILE, response.getWriter());
+		}
+		else if (target.equals("/style.css")) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			baseRequest.setHandled(true);
+			writeFile(CSS_FILE, response.getWriter());
 		}
 		else if (target.equals("/script.js")) {
 			response.setStatus(HttpServletResponse.SC_OK);
