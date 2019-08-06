@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+/**
+ * A Jetty handler implementing an HTTP server that hosts the
+ * JavaScript/WebSocket client. This server exists only to serve the client
+ * files and doesn't interact with the rest of the music player at all.
+ */
 public class WebSocketHttpHandler extends AbstractHandler {
 
 	private static final String CLIENT_BASE_DIR = ".." + File.separator + "javascript-client";

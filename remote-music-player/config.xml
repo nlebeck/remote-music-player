@@ -1,5 +1,6 @@
 <configuration>
   <baseDir>C:\Users\niell\Git\testfolder</baseDir>
   <musicFileTypes>mp3,m4a</musicFileTypes>
-  <port>8080</port>
+  <httpPort>8080</httpPort>
+  <webSocketPort>8081</webSocketPort>
 </configuration>

@@ -13,6 +13,9 @@ import org.java_websocket.server.WebSocketServer;
 
 import com.google.gson.Gson;
 
+/**
+ * A WebSocket server that supports the JavaScript/WebSocket client.
+ */
 public class CustomWebSocketServer extends WebSocketServer {
 
 	private class ClientMessage {

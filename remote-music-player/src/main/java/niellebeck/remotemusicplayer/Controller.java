@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class that handles interaction between the Jetty server and the MediaPlayer
+ * Class that mediates interaction between the web server and the MediaPlayer
  * thread.
  */
 public class Controller {
 
 	/*
-	 * These variables are accessed from both the Jetty server and the
+	 * These variables are accessed from both the web server and the
 	 * PlayerRunnable threads, so they are always accessed inside synchronized
 	 * methods
 	 */
@@ -25,7 +25,7 @@ public class Controller {
 	private String songRelativeDir = "";
 	
 	/*
-	 * These variables are accessed only from the Jetty server thread
+	 * These variables are accessed only from the web server thread
 	 */
 	private String currentRelativeDir = "";
 	private boolean songPaused = false;

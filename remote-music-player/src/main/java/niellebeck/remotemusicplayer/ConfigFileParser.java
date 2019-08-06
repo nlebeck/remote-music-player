@@ -49,8 +49,15 @@ public class ConfigFileParser {
 		return typesString.split(",");
 	}
 	
-	public int getPort() {
-		String portString = configFileDoc.getElementsByTagName("port")
+	public int getHttpPort() {
+		String portString = configFileDoc.getElementsByTagName("httpPort")
+				.item(0)
+				.getTextContent();
+		return Integer.parseInt(portString);
+	}
+	
+	public int getWebSocketPort() {
+		String portString = configFileDoc.getElementsByTagName("webSocketPort")
 				.item(0)
 				.getTextContent();
 		return Integer.parseInt(portString);

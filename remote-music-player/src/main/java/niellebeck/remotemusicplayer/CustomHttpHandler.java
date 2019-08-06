@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+/**
+ * A Jetty handler implementing an HTTP server that provides a simple HTML
+ * interface for clients. The interface consists entirely of links, and client
+ * commands are encoded as query parameters in the links.
+ */
 public class CustomHttpHandler extends AbstractHandler {
 
 	private Controller controller;
