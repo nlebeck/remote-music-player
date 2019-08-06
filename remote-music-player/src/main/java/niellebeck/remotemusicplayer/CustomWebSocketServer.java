@@ -2,8 +2,10 @@ package niellebeck.remotemusicplayer;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -26,10 +28,12 @@ public class CustomWebSocketServer extends WebSocketServer {
 	}
 	
 	private Controller controller;
+	private Set<WebSocket> connections;
 	
 	public CustomWebSocketServer(Controller controller, InetSocketAddress addr) {
 		super(addr);
 		this.controller = controller;
+		this.connections = new HashSet<WebSocket>();
 	}
 	
 	private String generateResponseJson() {
@@ -44,7 +48,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 	
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-		
+		connections.remove(conn);
 	}
 
 	@Override
@@ -90,13 +94,15 @@ public class CustomWebSocketServer extends WebSocketServer {
 		}
 		
 		if (needsResponse) {
-			conn.send(generateResponseJson());
+			for (WebSocket connection : connections) {
+				connection.send(generateResponseJson());
+			}
 		}
 	}
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		
+		connections.add(conn);
 	}
 
 	@Override
