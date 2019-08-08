@@ -1,38 +1,73 @@
+#controls {
+    display: flex;
+}
+
 #controls button {
+    flex: auto;
     padding: 0.5em;
     margin: 0em 0.5em;
+}
+
+#navigation, #songs {
+    display: flex;
+    flex-direction: column;
 }
 
 #navigation button, #songs button {
     display: block;
     padding: 0.5em;
-    margin: 1em 0em;
+    margin: 0.25em;
 }
 
-@media only screen and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+/* Non-retina-display settings */
+@media only screen and (-webkit-max-device-pixel-ratio: 1.5) {
+    body {
+        max-width: 40em;
+    }
+    
     h1 {
-        font-size: 32pt;
-    }
-    
-    h2 {
-        font-size: 28pt;
-    }
-    
-    p {
         font-size: 24pt;
     }
     
-    button {
+    h2 {
         font-size: 20pt;
     }
-}
-
-@media only screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+    
     p {
         font-size: 16pt;
     }
     
     button {
         font-size: 12pt;
+    }
+}
+
+/* Retina display, portrait mode settings */
+@media only screen and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+    h1 {
+        font-size: 44pt;
+    }
+    
+    h2 {
+        font-size: 40pt;
+    }
+    
+    p {
+        font-size: 36pt;
+    }
+    
+    button {
+        font-size: 32pt;
+    }
+}
+
+/* Retina display, landscape mode settings */
+@media only screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+    p {
+        font-size: 22pt;
+    }
+    
+    button {
+        font-size: 18pt;
     }
 }

@@ -89,6 +89,9 @@ Using JSON:
 * https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/json
 * https://github.com/google/gson
 
+Styling a web page with CSS:
+* https://developer.mozilla.org/en-US/docs/Learn/CSS
+
 Capturing device audio (old project plan):
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097
