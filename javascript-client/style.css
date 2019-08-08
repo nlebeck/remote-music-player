@@ -1,27 +1,38 @@
+#controls button {
+    padding: 0.5em;
+    margin: 0em 0.5em;
+}
+
+#navigation button, #songs button {
+    display: block;
+    padding: 0.5em;
+    margin: 1em 0em;
+}
+
 @media only screen and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
     h1 {
-        font-size: 32pt
+        font-size: 32pt;
     }
     
     h2 {
-        font-size: 28pt
+        font-size: 28pt;
     }
     
     p {
-        font-size: 24pt
+        font-size: 24pt;
     }
     
     button {
-        font-size: 20pt
+        font-size: 20pt;
     }
 }
 
 @media only screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
     p {
-        font-size: 16pt
+        font-size: 16pt;
     }
     
     button {
-        font-size: 12pt
+        font-size: 12pt;
     }
 }

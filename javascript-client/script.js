@@ -72,7 +72,6 @@ function redrawScreen(responseJson) {
             navigateUp();
         });
         navigationDiv.appendChild(upButton);
-        navigationDiv.appendChild(document.createElement("p"));
     }
     
     for (let childDir of responseJson.childDirs) {
@@ -82,8 +81,6 @@ function redrawScreen(responseJson) {
             changeDir(childDir);
         });
         navigationDiv.appendChild(button);
-        let paragraph = document.createElement("p");
-        navigationDiv.appendChild(paragraph);
     }
     
     let songsDiv = document.getElementById("songs");
@@ -98,8 +95,6 @@ function redrawScreen(responseJson) {
             play(song);
         });
         songsDiv.appendChild(button);
-        let paragraph = document.createElement("p");
-        songsDiv.appendChild(paragraph);
     }
 }
 
