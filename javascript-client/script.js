@@ -15,18 +15,9 @@ webSocket.addEventListener("message", function (event) {
 });
 
 function redrawScreen(responseJson) {
-    let statusDiv = document.getElementById("status");
+    let controlsDiv = document.getElementById("controls");
     // Based on the following StackOverflow answer:
     // https://stackoverflow.com/a/3955238.
-    while (statusDiv.firstChild) {
-        statusDiv.removeChild(statusDiv.firstChild);
-    }
-    
-    let currentDirParagraph = document.createElement("p");
-    currentDirParagraph.innerText = "Current directory: " + responseJson.currentDir;
-    statusDiv.appendChild(currentDirParagraph);
-    
-    let controlsDiv = document.getElementById("controls");
     while (controlsDiv.firstChild) {
         controlsDiv.removeChild(controlsDiv.firstChild);
     }
@@ -64,6 +55,10 @@ function redrawScreen(responseJson) {
     while (navigationDiv.firstChild) {
         navigationDiv.removeChild(navigationDiv.firstChild);
     }
+    
+    let currentDirParagraph = document.createElement("p");
+    currentDirParagraph.innerText = "Current directory: " + responseJson.currentDir;
+    navigationDiv.appendChild(currentDirParagraph);
     
     if (responseJson.currentDir != "") {
         let upButton = document.createElement("button");
