@@ -4,15 +4,24 @@
 // This might be a terrible practice. If it is, I would like to learn the
 // right way of passing this kind of information into a JavaScript script and
 // then modify this script appropriately.
-var webSocket = new WebSocket("ws://" + ipAddress + ":" + port);
+var webSocket;
+setupSocket();
 
-webSocket.addEventListener("open", event => {
-    webSocket.send(JSON.stringify({ command: "connect"}));
-});
-
-webSocket.addEventListener("message", function (event) {
-    redrawScreen(JSON.parse(event.data));
-});
+function setupSocket() {
+    webSocket = new WebSocket("ws://" + ipAddress + ":" + port);
+    
+    webSocket.addEventListener("open", event => {
+        webSocket.send(JSON.stringify({ command: "connect"}));
+    });
+    
+    webSocket.addEventListener("close", event => {
+        setupSocket();
+    });
+    
+    webSocket.addEventListener("message", function (event) {
+        redrawScreen(JSON.parse(event.data));
+    });
+}
 
 function redrawScreen(responseJson) {
     let controlsDiv = document.getElementById("controls");
