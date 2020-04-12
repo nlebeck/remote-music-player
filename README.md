@@ -26,6 +26,16 @@ file. For example, if the HTTP port is set to `8080` on a computer with IP
 address `192.168.0.1`, then you can access the web interface by navigating a
 web browser to `http://192.168.0.1:8080`.
 
+## Local Music Browser (work-in-progress)
+
+I have started working on an interface for controlling the music player from
+the local computer using an Xbox controller. With this feature, the music
+player could be controlled either from another device or from the computer
+itself. I'm using the [JXInput][JXInput] library to read controller input. My
+plan is to implement this feature gradually without breaking any existing
+functionality.  When I'm done implementing it, I'll update this README to
+reflect its presence.
+
 ## Using JavaFX with Maven
 
 The JavaFX documentation provides some
@@ -98,3 +108,4 @@ Capturing device audio (old project plan):
 * https://docs.oracle.com/javase/tutorial/sound/sampled-overview.html
 
 [JavaFX-Maven-quickstart]: https://openjfx.io/openjfx-docs/#maven
+[JXInput]: https://github.com/StrikerX3/JXInput

@@ -11,9 +11,9 @@ import java.util.List;
 public class Controller {
 
 	/*
-	 * These variables are accessed from both the web server and the
-	 * PlayerRunnable threads, so they are always accessed inside synchronized
-	 * methods
+	 * These variables are accessed from the web server thread, the local
+	 * browser thread, and the PlayerRunnable thread, so they are always
+	 * accessed inside synchronized methods
 	 */
 	private boolean pendingSongChange = false;
 	private String currentSongPath = null;
@@ -25,7 +25,9 @@ public class Controller {
 	private String songRelativeDir = "";
 	
 	/*
-	 * These variables are accessed only from the web server thread
+	 * These variables are accessed from both the web server thread and the
+	 * local browser thread, so they are always accessed inside synchronized
+	 * methods
 	 */
 	private String currentRelativeDir = "";
 	private boolean songPaused = false;
@@ -114,7 +116,7 @@ public class Controller {
 		}
 	}
 	
-	public void navigateUp() {
+	public synchronized void navigateUp() {
 		if (!currentRelativeDir.equals("")) {
 			File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
 			String parentDir = currentDirFile.getParent();
@@ -123,7 +125,7 @@ public class Controller {
 		}
 	}
 	
-	public void navigate(String target) {
+	public synchronized void navigate(String target) {
 		String targetPath = baseDir + File.separator + currentRelativeDir + File.separator + target;
 		File targetFile = new File(targetPath);
 		if (targetFile.isDirectory()) {
@@ -131,19 +133,19 @@ public class Controller {
 		}
 	}
 	
-	public void playSong(String target) {
+	public synchronized void playSong(String target) {
 		changeSong(target, currentRelativeDir);
 	}
 	
-	public boolean songIsPaused() {
+	public synchronized boolean songIsPaused() {
 		return songPaused;
 	}
 	
-	public String getCurrentRelativeDir() {
+	public synchronized String getCurrentRelativeDir() {
 		return currentRelativeDir;
 	}
 	
-	public List<String> getSongsInCurrentDir() {
+	public synchronized List<String> getSongsInCurrentDir() {
 		return getSongsInDir(currentRelativeDir);
 	}
 	
@@ -161,7 +163,7 @@ public class Controller {
 		return songs;
 	}
 	
-	public List<String> getChildDirsInCurrentDir() {
+	public synchronized List<String> getChildDirsInCurrentDir() {
 		List<String> childDirs = new ArrayList<String>();
 		File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
 		String[] children = currentDirFile.list();
