@@ -59,6 +59,10 @@ public class Controller {
 		songPaused = false;
 	}
 	
+	public synchronized String getCurrentSong() {
+		return currentSong;
+	}
+	
 	public synchronized String checkForSongChange() {
 		if (pendingSongChange) {
 			pendingSongChange = false;

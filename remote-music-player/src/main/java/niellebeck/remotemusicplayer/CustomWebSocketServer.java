@@ -29,6 +29,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 		public boolean paused;
 		public String currentDir;
 		public String volume;
+		public String currentSong;
 	}
 	
 	private Controller controller;
@@ -48,6 +49,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 		response.paused = controller.songIsPaused();
 		response.currentDir = controller.getCurrentRelativeDir();
 		response.volume = String.format("%.2f", controller.getVolume());
+		response.currentSong =  controller.getCurrentSong();
 		return gson.toJson(response);
 	}
 	
@@ -64,7 +66,6 @@ public class CustomWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("Got message from client: " + message);
-		boolean needsResponse = false;
 		Gson gson = new Gson();
 		ClientMessage clientMessage = gson.fromJson(message, ClientMessage.class);
 		switch(clientMessage.command) {
@@ -73,19 +74,15 @@ public class CustomWebSocketServer extends WebSocketServer {
 			break;
 		case "navigate":
 			controller.navigate(clientMessage.argument);
-			needsResponse = true;
 			break;
 		case "navigateUp":
 			controller.navigateUp();
-			needsResponse = true;
 			break;
 		case "pause":
 			controller.pauseSong();
-			needsResponse = true;
 			break;
 		case "unpause":
 			controller.unpauseSong();
-			needsResponse = true;
 			break;
 		case "prev":
 			controller.playPrevSong();
@@ -94,22 +91,17 @@ public class CustomWebSocketServer extends WebSocketServer {
 			controller.playNextSong();
 			break;
 		case "connect":
-			needsResponse = true;
 			break;
 		case "volumeDown":
 			controller.decreaseVolume();
-			needsResponse = true;
 			break;
 		case "volumeUp":
 			controller.increaseVolume();
-			needsResponse = true;
 			break;
 		}
 		
-		if (needsResponse) {
-			for (WebSocket connection : connections) {
-				connection.send(generateResponseJson());
-			}
+		for (WebSocket connection : connections) {
+			connection.send(generateResponseJson());
 		}
 	}
 

@@ -92,6 +92,10 @@ function redrawScreen(responseJson) {
     currentDirParagraph.innerText = "Current directory: " + responseJson.currentDir;
     navigationDiv.appendChild(currentDirParagraph);
     
+    let currentSongParagraph = document.createElement("p");
+    currentSongParagraph.innerText = "Current song: " + responseJson.currentSong;
+    navigationDiv.appendChild(currentSongParagraph);
+    
     if (responseJson.currentDir != "") {
         let upButton = document.createElement("button");
         upButton.innerText = "Up";
