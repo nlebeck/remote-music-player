@@ -1,8 +1,8 @@
-#controls {
+#controls, #volume {
     display: flex;
 }
 
-#controls button {
+#controls button, #volume button {
     flex: auto;
     padding: 0.5em;
     margin: 0em 0.5em;
@@ -33,7 +33,7 @@
         font-size: 20pt;
     }
     
-    p {
+    p, span {
         font-size: 16pt;
     }
     
@@ -52,7 +52,7 @@
         font-size: 40pt;
     }
     
-    p {
+    p, span {
         font-size: 36pt;
     }
     
@@ -63,7 +63,7 @@
 
 /* Retina display, landscape mode settings */
 @media only screen and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
-    p {
+    p, span {
         font-size: 22pt;
     }
     

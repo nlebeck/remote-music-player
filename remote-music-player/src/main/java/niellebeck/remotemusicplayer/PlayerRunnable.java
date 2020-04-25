@@ -51,6 +51,10 @@ public class PlayerRunnable implements Runnable {
 					player.play();
 				}
 			}
+			
+			if (player != null) {
+				player.setVolume(controller.getVolume());
+			}
 
 			try {
 				Thread.sleep(500);

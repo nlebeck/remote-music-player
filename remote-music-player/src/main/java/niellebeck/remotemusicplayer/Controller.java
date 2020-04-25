@@ -10,6 +10,11 @@ import java.util.List;
  */
 public class Controller {
 
+	private static final double VOLUME_MIN = 0.0;
+	private static final double VOLUME_MAX = 0.6;
+	private static final double VOLUME_DELTA = 0.05;
+	private static final double VOLUME_DEFAULT = 0.25;
+	
 	/*
 	 * These variables are accessed from the web server thread, the local
 	 * browser thread, and the PlayerRunnable thread, so they are always
@@ -23,6 +28,8 @@ public class Controller {
 	
 	private String currentSong = "";
 	private String songRelativeDir = "";
+	
+	private double volume = VOLUME_DEFAULT;
 	
 	/*
 	 * These variables are accessed from both the web server thread and the
@@ -186,5 +193,23 @@ public class Controller {
 			}
 		}
 		return false;
+	}
+	
+	public synchronized void increaseVolume() {
+		volume += VOLUME_DELTA;
+		if (volume > VOLUME_MAX) {
+			volume = VOLUME_MAX;
+		}
+	}
+	
+	public synchronized void decreaseVolume() {
+		volume -= VOLUME_DELTA;
+		if (volume < VOLUME_MIN) {
+			volume = VOLUME_MIN;
+		}
+	}
+	
+	public synchronized double getVolume() {
+		return volume;
 	}
 }

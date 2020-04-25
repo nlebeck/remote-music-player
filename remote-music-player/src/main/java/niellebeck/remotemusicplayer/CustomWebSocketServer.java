@@ -28,6 +28,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 		public List<String> childDirs;
 		public boolean paused;
 		public String currentDir;
+		public String volume;
 	}
 	
 	private Controller controller;
@@ -46,6 +47,7 @@ public class CustomWebSocketServer extends WebSocketServer {
 		response.childDirs = controller.getChildDirsInCurrentDir();
 		response.paused = controller.songIsPaused();
 		response.currentDir = controller.getCurrentRelativeDir();
+		response.volume = String.format("%.2f", controller.getVolume());
 		return gson.toJson(response);
 	}
 	
@@ -92,6 +94,14 @@ public class CustomWebSocketServer extends WebSocketServer {
 			controller.playNextSong();
 			break;
 		case "connect":
+			needsResponse = true;
+			break;
+		case "volumeDown":
+			controller.decreaseVolume();
+			needsResponse = true;
+			break;
+		case "volumeUp":
+			controller.increaseVolume();
 			needsResponse = true;
 			break;
 		}

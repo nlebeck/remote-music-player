@@ -59,6 +59,29 @@ function redrawScreen(responseJson) {
         next();
     });
     controlsDiv.appendChild(nextButton);
+
+    let volumeDiv = document.getElementById("volume");
+    while (volumeDiv.firstChild) {
+        volumeDiv.removeChild(volumeDiv.firstChild);
+    }
+
+    let volumeDownButton = document.createElement("button");
+    volumeDownButton.innerText = "Vol -";
+    volumeDownButton.addEventListener("click", event => {
+        volumeDown();
+    });
+    volumeDiv.appendChild(volumeDownButton);
+
+    let volumeParagraph = document.createElement("span");
+    volumeParagraph.innerText = "Vol: " + responseJson.volume;
+    volumeDiv.appendChild(volumeParagraph);
+
+    let volumeUpButton = document.createElement("button");
+    volumeUpButton.innerText = "Vol +";
+    volumeUpButton.addEventListener("click", event => {
+        volumeUp();
+    });
+    volumeDiv.appendChild(volumeUpButton);
     
     let navigationDiv = document.getElementById("navigation");
     while (navigationDiv.firstChild) {
@@ -128,4 +151,12 @@ function next() {
 
 function play(song) {
     webSocket.send(JSON.stringify({ command: "play", argument: song }));
+}
+
+function volumeUp() {
+    webSocket.send(JSON.stringify({ command: "volumeUp" }));
+}
+
+function volumeDown() {
+    webSocket.send(JSON.stringify({ command: "volumeDown" }));
 }
