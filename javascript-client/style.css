@@ -1,11 +1,18 @@
+/* I learned about the align-items property on this page:
+   https://www.w3.org/Style/Examples/007/center.en.html */
 #controls, #volume {
     display: flex;
+    align-items: center;
 }
 
 #controls button, #volume button {
     flex: auto;
     padding: 0.5em;
     margin: 0em 0.5em;
+}
+
+#volume {
+    margin-top: 0.5em;
 }
 
 #navigation, #songs {
