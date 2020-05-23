@@ -102,6 +102,9 @@ Using JSON:
 Styling a web page with CSS:
 * https://developer.mozilla.org/en-US/docs/Learn/CSS
 
+Running code on the JavaFX Application Thread:
+* https://noblecodemonkeys.com/switching-to-the-gui-thread-in-javafx/
+
 Capturing device audio (old project plan):
 * https://stackoverflow.com/q/31738072
 * https://stackoverflow.com/q/28122097

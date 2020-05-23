@@ -6,7 +6,10 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import com.github.strikerx3.jxinput.enums.XInputButton;
 import com.github.strikerx3.jxinput.exceptions.XInputNotLoadedException;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
 /**
  * A class encapsulating the logic to control the music player from the local
@@ -69,6 +72,7 @@ public class LocalBrowser {
 		shouldStop = true;
 	}
 	
+	// Called on the JavaFX Application Thread.
 	public void update() {
 		if (device != null && device.poll()) {
 			XInputComponentsDelta delta = device.getDelta();
@@ -92,6 +96,36 @@ public class LocalBrowser {
 				handleStart();
 			}
 		}
+		
+		/*
+		 * This page taught me how to schedule code to run on the JavaFX
+		 * Application Thread:
+		 * https://noblecodemonkeys.com/switching-to-the-gui-thread-in-javafx/.
+		 */
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				drawDisplay();
+			}
+		});
+	}
+	
+	private void drawDisplay() {
+		GridPane gridPane = new GridPane();
+		int currentRow = 0;
+		
+		gridPane.add(new Label("Navigation"), 0, currentRow++);
+		gridPane.add(new Label("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
+		gridPane.add(new Label("Current song: " + controller.getCurrentSong()), 0, currentRow++);
+		for (String childDir : controller.getChildDirsInCurrentDir()) {
+			gridPane.add(new Label(childDir), 0, currentRow++);
+		}
+		
+		gridPane.add(new Label("Songs"), 0, currentRow++);
+		for (String song : controller.getSongsInCurrentDir()) {
+			gridPane.add(new Label(song), 0, currentRow++);
+		}
+		scene.setRoot(gridPane);
 	}
 	
 	private void handleA() {
