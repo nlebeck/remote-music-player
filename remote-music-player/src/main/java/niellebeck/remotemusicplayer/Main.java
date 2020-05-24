@@ -33,7 +33,7 @@ public class Main extends Application {
 	private WebSocketServer webSocketServer;
 	private Server jettyServer;
 	private Controller controller;
-	private LocalBrowser localBrowser;
+	//private LocalBrowser localBrowser;
 
 	public static void main(String[] args) {
 		launch();
@@ -77,8 +77,8 @@ public class Main extends Application {
 		playerThread.setDaemon(true);
 		playerThread.start();
 		
-		localBrowser = new LocalBrowser(scene, controller);
-		localBrowser.start();
+		//localBrowser = new LocalBrowser(scene, controller);
+		//localBrowser.start();
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class Main extends Application {
 		try {
 			jettyServer.stop();
 			webSocketServer.stop();
-			localBrowser.stop();
+			//localBrowser.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
