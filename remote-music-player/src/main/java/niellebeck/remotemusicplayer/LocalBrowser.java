@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 
 /**
  * A class encapsulating the logic to control the music player from the local
@@ -130,34 +131,34 @@ public class LocalBrowser {
 		GridPane gridPane = new GridPane();
 		int currentRow = 0;
 
-		gridPane.add(new Label("Status"), 0, currentRow++);
-		gridPane.add(new Label(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++);
-		gridPane.add(new Label("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++);
+		gridPane.add(createHeaderLabel("Status"), 0, currentRow++);
+		gridPane.add(createNormalLabel(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++);
+		gridPane.add(createNormalLabel("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++);
 		
-		gridPane.add(new Label("Navigation"), 0, currentRow++);
-		gridPane.add(new Label("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
-		gridPane.add(new Label("Current song: " + controller.getCurrentSong()), 0, currentRow++);
+		gridPane.add(createHeaderLabel("Navigation"), 0, currentRow++);
+		gridPane.add(createNormalLabel("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
+		gridPane.add(createNormalLabel("Current song: " + controller.getCurrentSong()), 0, currentRow++);
 		
 		// Start of labels in DIR area
 		int currentDirItem = 0;
-		Label upLabel = new Label("Up");
+		Label upLabel = createNormalLabel("Up");
 		underlineIfSelectedDir(upLabel, currentDirItem);
 		currentDirItem++;
 		gridPane.add(upLabel, 0, currentRow++);
 		for (String childDir : controller.getChildDirsInCurrentDir()) {
-			Label childDirLabel = new Label(childDir);
+			Label childDirLabel = createNormalLabel(childDir);
 			underlineIfSelectedDir(childDirLabel, currentDirItem);
 			currentDirItem++;
 			gridPane.add(childDirLabel, 0, currentRow++);
 		}
 		// End of labels in DIR area
 		
-		gridPane.add(new Label("Songs"), 0, currentRow++);
+		gridPane.add(createHeaderLabel("Songs"), 0, currentRow++);
 		
 		// Start of labels in SONGS area
 		int currentSongItem = 0;
 		for (String song : controller.getSongsInCurrentDir()) {
-			Label songLabel = new Label(song);
+			Label songLabel = createNormalLabel(song);
 			underlineIfSelectedSong(songLabel, currentSongItem);
 			currentSongItem++;
 			gridPane.add(songLabel, 0, currentRow++);
@@ -165,6 +166,18 @@ public class LocalBrowser {
 		// End of labels in SONGS area
 		
 		scene.setRoot(gridPane);
+	}
+	
+	private Label createHeaderLabel(String text) {
+		Label headerLabel = new Label(text);
+		headerLabel.setFont(new Font(20));
+		return headerLabel;
+	}
+	
+	private Label createNormalLabel(String text) {
+		Label label = new Label(text);
+		label.setFont(new Font(12));
+		return label;
 	}
 	
 	private void underlineIfSelectedDir(Label label, int currentDirItem) {
