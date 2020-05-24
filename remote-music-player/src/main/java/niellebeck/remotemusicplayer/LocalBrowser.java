@@ -40,6 +40,8 @@ public class LocalBrowser {
 	private SelectedArea selectedArea;
 	private int selectedItem;
 	
+	private String cachedCurrentRelativeDir;
+	
 	public LocalBrowser(Scene scene, Controller controller) {
 		this.scene = scene;
 		this.controller = controller;
@@ -48,6 +50,8 @@ public class LocalBrowser {
 		
 		selectedArea = SelectedArea.DIRS;
 		selectedItem = 0;
+		
+		cachedCurrentRelativeDir = "";
 	}
 	
 	public XInputDevice initDevice() {
@@ -90,6 +94,8 @@ public class LocalBrowser {
 	
 	// Called on the JavaFX Application Thread.
 	public void update() {
+		checkForDirectoryChange();
+		
 		if (device != null && device.poll()) {
 			XInputComponentsDelta delta = device.getDelta();
 			XInputButtonsDelta buttonsDelta = delta.getButtons();
@@ -136,6 +142,14 @@ public class LocalBrowser {
 				drawDisplay();
 			}
 		});
+	}
+	
+	private void checkForDirectoryChange() {
+		if (controller.getCurrentRelativeDir() != cachedCurrentRelativeDir) {
+			selectedArea = SelectedArea.DIRS;
+			selectedItem = 0;
+		}
+		cachedCurrentRelativeDir = controller.getCurrentRelativeDir();
 	}
 	
 	private void drawDisplay() {
