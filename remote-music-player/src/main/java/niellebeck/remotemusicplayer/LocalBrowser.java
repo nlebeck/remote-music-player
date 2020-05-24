@@ -9,6 +9,7 @@ import com.github.strikerx3.jxinput.exceptions.XInputNotLoadedException;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
@@ -25,6 +26,10 @@ public class LocalBrowser {
 	private enum SelectedArea {
 		DIRS, SONGS
 	}
+	
+	private static final int LEFT_COLUMN_WIDTH = 320;
+	private static final int HEADER_FONT_SIZE = 20;
+	private static final int NORMAL_FONT_SIZE = 12;
 	
 	private Scene scene;
 	private Controller controller;
@@ -112,6 +117,12 @@ public class LocalBrowser {
 			else if (buttonsDelta.isPressed(XInputButton.START)) {
 				handleStart();
 			}
+			else if (buttonsDelta.isPressed(XInputButton.LEFT_SHOULDER)) {
+				handleLeftShoulder();
+			}
+			else if (buttonsDelta.isPressed(XInputButton.RIGHT_SHOULDER)) {
+				handleRightShoulder();
+			}
 		}
 		
 		/*
@@ -129,15 +140,19 @@ public class LocalBrowser {
 	
 	private void drawDisplay() {
 		GridPane gridPane = new GridPane();
+		gridPane.getColumnConstraints().add(new ColumnConstraints(LEFT_COLUMN_WIDTH));
+		
 		int currentRow = 0;
 
-		gridPane.add(createHeaderLabel("Status"), 0, currentRow++);
-		gridPane.add(createNormalLabel(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++);
-		gridPane.add(createNormalLabel("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++);
+		gridPane.add(createHeaderLabel("Status"), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Current song: " + controller.getCurrentSong()), 0, currentRow++, 2, 1);
+		
+		int twoColumnStartRow = currentRow;
 		
 		gridPane.add(createHeaderLabel("Navigation"), 0, currentRow++);
-		gridPane.add(createNormalLabel("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
-		gridPane.add(createNormalLabel("Current song: " + controller.getCurrentSong()), 0, currentRow++);
 		
 		// Start of labels in DIR area
 		int currentDirItem = 0;
@@ -153,7 +168,9 @@ public class LocalBrowser {
 		}
 		// End of labels in DIR area
 		
-		gridPane.add(createHeaderLabel("Songs"), 0, currentRow++);
+		currentRow = twoColumnStartRow;
+		
+		gridPane.add(createHeaderLabel("Songs"), 1, currentRow++);
 		
 		// Start of labels in SONGS area
 		int currentSongItem = 0;
@@ -161,7 +178,7 @@ public class LocalBrowser {
 			Label songLabel = createNormalLabel(song);
 			underlineIfSelectedSong(songLabel, currentSongItem);
 			currentSongItem++;
-			gridPane.add(songLabel, 0, currentRow++);
+			gridPane.add(songLabel, 1, currentRow++);
 		}
 		// End of labels in SONGS area
 		
@@ -170,13 +187,13 @@ public class LocalBrowser {
 	
 	private Label createHeaderLabel(String text) {
 		Label headerLabel = new Label(text);
-		headerLabel.setFont(new Font(20));
+		headerLabel.setFont(new Font(HEADER_FONT_SIZE));
 		return headerLabel;
 	}
 	
 	private Label createNormalLabel(String text) {
 		Label label = new Label(text);
-		label.setFont(new Font(12));
+		label.setFont(new Font(NORMAL_FONT_SIZE));
 		return label;
 	}
 	
@@ -204,32 +221,24 @@ public class LocalBrowser {
 		return controller.getChildDirsInCurrentDir().size() + 1;
 	}
 	
+	private int getNumItemsInSongsArea() {
+		return controller.getSongsInCurrentDir().size();
+	}
+	
 	private void moveCursorDown() {
 		selectedItem++;
 		if (selectedArea == SelectedArea.DIRS && selectedItem >= getNumItemsInDirsArea()) {
-			if (controller.getSongsInCurrentDir().size() > 0) {
-				selectedArea = SelectedArea.SONGS;
-				selectedItem = 0;
-			}
-			else {
-				selectedItem = getNumItemsInDirsArea() - 1;
-			}
+			selectedItem = getNumItemsInDirsArea() - 1;
 		}
-		else if (selectedArea == SelectedArea.SONGS && selectedItem >= controller.getSongsInCurrentDir().size()) {
-			selectedItem = controller.getSongsInCurrentDir().size() - 1;
+		else if (selectedArea == SelectedArea.SONGS && selectedItem >= getNumItemsInSongsArea()) {
+			selectedItem = getNumItemsInSongsArea() - 1;
 		}
 	}
 	
 	private void moveCursorUp() {
 		selectedItem--;
 		if (selectedItem < 0) {
-			if (selectedArea == SelectedArea.DIRS) {
-				selectedItem = 0;
-			}
-			else if (selectedArea == SelectedArea.SONGS) {
-				selectedArea = SelectedArea.DIRS;
-				selectedItem = getNumItemsInDirsArea() - 1;
-			}
+			selectedItem = 0;
 		}
 	}
 	
@@ -282,6 +291,18 @@ public class LocalBrowser {
 	
 	private void handleRight() {
 		controller.playNextSong();
+	}
+	
+	private void handleLeftShoulder() {
+		selectedArea = SelectedArea.DIRS;
+		selectedItem = 0;
+	}
+	
+	private void handleRightShoulder() {
+		if (getNumItemsInSongsArea() > 0) {
+			selectedArea = SelectedArea.SONGS;
+			selectedItem = 0;
+		}
 	}
 	
 }
