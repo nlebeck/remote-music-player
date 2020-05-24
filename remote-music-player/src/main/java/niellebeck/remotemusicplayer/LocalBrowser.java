@@ -90,6 +90,12 @@ public class LocalBrowser {
 			if (buttonsDelta.isPressed(XInputButton.A)) {
 				handleA();
 			}
+			else if (buttonsDelta.isPressed(XInputButton.X)) {
+				handleX();
+			}
+			else if (buttonsDelta.isPressed(XInputButton.Y)) {
+				handleY();
+			}
 			else if (buttonsDelta.isPressed(XInputButton.DPAD_UP)) {
 				handleUp();
 			}
@@ -123,6 +129,10 @@ public class LocalBrowser {
 	private void drawDisplay() {
 		GridPane gridPane = new GridPane();
 		int currentRow = 0;
+
+		gridPane.add(new Label("Status"), 0, currentRow++);
+		gridPane.add(new Label(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++);
+		gridPane.add(new Label("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++);
 		
 		gridPane.add(new Label("Navigation"), 0, currentRow++);
 		gridPane.add(new Label("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
@@ -226,6 +236,14 @@ public class LocalBrowser {
 		else if (selectedArea == SelectedArea.SONGS) {
 			controller.playSong(controller.getSongsInCurrentDir().get(selectedItem));
 		}
+	}
+	
+	private void handleX() {
+		controller.decreaseVolume();
+	}
+	
+	private void handleY() {
+		controller.increaseVolume();
 	}
 	
 	private void handleStart() {
