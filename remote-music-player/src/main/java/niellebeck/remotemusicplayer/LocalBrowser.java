@@ -31,6 +31,9 @@ public class LocalBrowser {
 	private static final int HEADER_FONT_SIZE = 20;
 	private static final int NORMAL_FONT_SIZE = 12;
 	
+	private static final int NUM_VISIBLE_DIR_ITEMS = 20;
+	private static final int NUM_VISIBLE_SONG_ITEMS = 20;
+	
 	private Scene scene;
 	private Controller controller;
 	private XInputDevice device;
@@ -39,6 +42,9 @@ public class LocalBrowser {
 	
 	private SelectedArea selectedArea;
 	private int selectedItem;
+	
+	private int minVisibleDirItem;
+	private int minVisibleSongItem;
 	
 	private String cachedCurrentRelativeDir;
 	
@@ -50,6 +56,9 @@ public class LocalBrowser {
 		
 		selectedArea = SelectedArea.DIRS;
 		selectedItem = 0;
+		
+		minVisibleDirItem = 0;
+		minVisibleSongItem = 0;
 		
 		cachedCurrentRelativeDir = "";
 	}
@@ -92,8 +101,8 @@ public class LocalBrowser {
 		shouldStop = true;
 	}
 	
-	// Called on the JavaFX Application Thread.
-	public void update() {
+	// Called on the LocalBrowser's background thread
+	public synchronized void update() {
 		checkForDirectoryChange();
 		
 		if (device != null && device.poll()) {
@@ -146,13 +155,13 @@ public class LocalBrowser {
 	
 	private void checkForDirectoryChange() {
 		if (controller.getCurrentRelativeDir() != cachedCurrentRelativeDir) {
-			selectedArea = SelectedArea.DIRS;
-			selectedItem = 0;
+			resetSelection();
 		}
 		cachedCurrentRelativeDir = controller.getCurrentRelativeDir();
 	}
 	
-	private void drawDisplay() {
+	// Called on the JavaFX Application Thread
+	private synchronized void drawDisplay() {
 		GridPane gridPane = new GridPane();
 		gridPane.getColumnConstraints().add(new ColumnConstraints(LEFT_COLUMN_WIDTH));
 		
@@ -169,16 +178,11 @@ public class LocalBrowser {
 		gridPane.add(createHeaderLabel("Navigation"), 0, currentRow++);
 		
 		// Start of labels in DIR area
-		int currentDirItem = 0;
-		Label upLabel = createNormalLabel("Up");
-		underlineIfSelectedDir(upLabel, currentDirItem);
-		currentDirItem++;
-		gridPane.add(upLabel, 0, currentRow++);
-		for (String childDir : controller.getChildDirsInCurrentDir()) {
-			Label childDirLabel = createNormalLabel(childDir);
-			underlineIfSelectedDir(childDirLabel, currentDirItem);
-			currentDirItem++;
-			gridPane.add(childDirLabel, 0, currentRow++);
+		int maxVisibleDirItem = Math.min(minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1, getNumItemsInDirsArea() - 1);
+		for (int i = minVisibleDirItem; i <= maxVisibleDirItem; i++) {
+			Label dirLabel = createNormalLabel(getDirItem(i));
+			underlineIfSelectedDir(dirLabel, i);
+			gridPane.add(dirLabel, 0, currentRow++);
 		}
 		// End of labels in DIR area
 		
@@ -187,11 +191,10 @@ public class LocalBrowser {
 		gridPane.add(createHeaderLabel("Songs"), 1, currentRow++);
 		
 		// Start of labels in SONGS area
-		int currentSongItem = 0;
-		for (String song : controller.getSongsInCurrentDir()) {
-			Label songLabel = createNormalLabel(song);
-			underlineIfSelectedSong(songLabel, currentSongItem);
-			currentSongItem++;
+		int maxVisibleSongItem = Math.min(minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1, getNumItemsInSongsArea() - 1);
+		for (int i = minVisibleSongItem; i <= maxVisibleSongItem; i++) {
+			Label songLabel = createNormalLabel(getSongItem(i));
+			underlineIfSelectedSong(songLabel, i);
 			gridPane.add(songLabel, 1, currentRow++);
 		}
 		// End of labels in SONGS area
@@ -199,13 +202,13 @@ public class LocalBrowser {
 		scene.setRoot(gridPane);
 	}
 	
-	private Label createHeaderLabel(String text) {
+	private static Label createHeaderLabel(String text) {
 		Label headerLabel = new Label(text);
 		headerLabel.setFont(new Font(HEADER_FONT_SIZE));
 		return headerLabel;
 	}
 	
-	private Label createNormalLabel(String text) {
+	private static Label createNormalLabel(String text) {
 		Label label = new Label(text);
 		label.setFont(new Font(NORMAL_FONT_SIZE));
 		return label;
@@ -235,42 +238,93 @@ public class LocalBrowser {
 		return controller.getChildDirsInCurrentDir().size() + 1;
 	}
 	
+	private String getDirItem(int index) {
+		if (index == 0) {
+			return "Up";
+		}
+		else {
+			return controller.getChildDirsInCurrentDir().get(index - 1);
+		}
+	}
+	
+	private void handleDirItemAction(int index) {
+		if (selectedItem == 0) {
+			controller.navigateUp();
+		}
+		else {
+			int selectedChildDir = selectedItem - 1;
+			controller.navigate(controller.getChildDirsInCurrentDir().get(selectedChildDir));
+		}
+		
+		resetSelection();
+	}
+	
 	private int getNumItemsInSongsArea() {
 		return controller.getSongsInCurrentDir().size();
 	}
 	
+	private String getSongItem(int index) {
+		return controller.getSongsInCurrentDir().get(index);
+	}
+	
+	private void handleSongItemAction(int index) {
+		controller.playSong(controller.getSongsInCurrentDir().get(index));
+	}
+	
+	private void resetSelection() {
+		selectedArea = SelectedArea.DIRS;
+		selectedItem = 0;
+		
+		minVisibleDirItem = 0;
+		minVisibleSongItem = 0;
+	}
+	
 	private void moveCursorDown() {
 		selectedItem++;
-		if (selectedArea == SelectedArea.DIRS && selectedItem >= getNumItemsInDirsArea()) {
-			selectedItem = getNumItemsInDirsArea() - 1;
+		if (selectedArea == SelectedArea.DIRS) {
+			if (selectedItem >= getNumItemsInDirsArea()) {
+				selectedItem = getNumItemsInDirsArea() - 1;
+			}
+			if (selectedItem > minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1) {
+				minVisibleDirItem++;
+			}
 		}
-		else if (selectedArea == SelectedArea.SONGS && selectedItem >= getNumItemsInSongsArea()) {
-			selectedItem = getNumItemsInSongsArea() - 1;
+		else if (selectedArea == SelectedArea.SONGS) {
+			if (selectedItem >= getNumItemsInSongsArea()) {
+				selectedItem = getNumItemsInSongsArea() - 1;
+			}
+			if (selectedItem > minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1) {
+				minVisibleSongItem++;
+			}
 		}
 	}
 	
 	private void moveCursorUp() {
 		selectedItem--;
-		if (selectedItem < 0) {
-			selectedItem = 0;
+		if (selectedArea == SelectedArea.DIRS) {
+			if (selectedItem < 0) {
+				selectedItem = 0;
+			}
+			if (selectedItem < minVisibleDirItem) {
+				minVisibleDirItem--;
+			}
+		}
+		else if (selectedArea == SelectedArea.SONGS) {
+			if (selectedItem < 0) {
+				selectedItem = 0;
+			}
+			if (selectedItem < minVisibleSongItem) {
+				minVisibleSongItem--;
+			}
 		}
 	}
 	
 	private void handleA() {
 		if (selectedArea == SelectedArea.DIRS) {
-			if (selectedItem == 0) {
-				controller.navigateUp();
-			}
-			else {
-				int selectedChildDir = selectedItem - 1;
-				controller.navigate(controller.getChildDirsInCurrentDir().get(selectedChildDir));
-			}
-			
-			selectedArea = SelectedArea.DIRS;
-			selectedItem = 0;
+			handleDirItemAction(selectedItem);
 		}
 		else if (selectedArea == SelectedArea.SONGS) {
-			controller.playSong(controller.getSongsInCurrentDir().get(selectedItem));
+			handleSongItemAction(selectedItem);
 		}
 	}
 	
