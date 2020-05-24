@@ -21,17 +21,27 @@ import javafx.scene.layout.GridPane;
  */
 public class LocalBrowser {
 
+	private enum SelectedArea {
+		DIRS, SONGS
+	}
+	
 	private Scene scene;
 	private Controller controller;
 	private XInputDevice device;
 	private Thread thread;
 	private volatile boolean shouldStop;
 	
+	private SelectedArea selectedArea;
+	private int selectedItem;
+	
 	public LocalBrowser(Scene scene, Controller controller) {
 		this.scene = scene;
 		this.controller = controller;
 		this.device = initDevice();
 		shouldStop = false;
+		
+		selectedArea = SelectedArea.DIRS;
+		selectedItem = 0;
 	}
 	
 	public XInputDevice initDevice() {
@@ -117,19 +127,105 @@ public class LocalBrowser {
 		gridPane.add(new Label("Navigation"), 0, currentRow++);
 		gridPane.add(new Label("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++);
 		gridPane.add(new Label("Current song: " + controller.getCurrentSong()), 0, currentRow++);
+		
+		// Start of labels in DIR area
+		int currentDirItem = 0;
+		Label upLabel = new Label("Up");
+		underlineIfSelectedDir(upLabel, currentDirItem);
+		currentDirItem++;
+		gridPane.add(upLabel, 0, currentRow++);
 		for (String childDir : controller.getChildDirsInCurrentDir()) {
-			gridPane.add(new Label(childDir), 0, currentRow++);
+			Label childDirLabel = new Label(childDir);
+			underlineIfSelectedDir(childDirLabel, currentDirItem);
+			currentDirItem++;
+			gridPane.add(childDirLabel, 0, currentRow++);
 		}
+		// End of labels in DIR area
 		
 		gridPane.add(new Label("Songs"), 0, currentRow++);
+		
+		// Start of labels in SONGS area
+		int currentSongItem = 0;
 		for (String song : controller.getSongsInCurrentDir()) {
-			gridPane.add(new Label(song), 0, currentRow++);
+			Label songLabel = new Label(song);
+			underlineIfSelectedSong(songLabel, currentSongItem);
+			currentSongItem++;
+			gridPane.add(songLabel, 0, currentRow++);
 		}
+		// End of labels in SONGS area
+		
 		scene.setRoot(gridPane);
 	}
 	
+	private void underlineIfSelectedDir(Label label, int currentDirItem) {
+		if (isSelectedDir(currentDirItem)) {
+			label.setUnderline(true);
+		}
+	}
+	
+	private void underlineIfSelectedSong(Label label, int currentSongItem) {
+		if (isSelectedSong(currentSongItem)) {
+			label.setUnderline(true);
+		}
+	}
+	
+	private boolean isSelectedDir(int currentDirItem) {
+		return selectedArea == SelectedArea.DIRS && selectedItem == currentDirItem;
+	}
+	
+	private boolean isSelectedSong(int currentSongItem) {
+		return selectedArea == SelectedArea.SONGS && selectedItem == currentSongItem;
+	}
+	
+	private int getNumItemsInDirsArea() {
+		return controller.getChildDirsInCurrentDir().size() + 1;
+	}
+	
+	private void moveCursorDown() {
+		selectedItem++;
+		if (selectedArea == SelectedArea.DIRS && selectedItem >= getNumItemsInDirsArea()) {
+			if (controller.getSongsInCurrentDir().size() > 0) {
+				selectedArea = SelectedArea.SONGS;
+				selectedItem = 0;
+			}
+			else {
+				selectedItem = getNumItemsInDirsArea() - 1;
+			}
+		}
+		else if (selectedArea == SelectedArea.SONGS && selectedItem >= controller.getSongsInCurrentDir().size()) {
+			selectedItem = controller.getSongsInCurrentDir().size() - 1;
+		}
+	}
+	
+	private void moveCursorUp() {
+		selectedItem--;
+		if (selectedItem < 0) {
+			if (selectedArea == SelectedArea.DIRS) {
+				selectedItem = 0;
+			}
+			else if (selectedArea == SelectedArea.SONGS) {
+				selectedArea = SelectedArea.DIRS;
+				selectedItem = getNumItemsInDirsArea() - 1;
+			}
+		}
+	}
+	
 	private void handleA() {
-		
+		if (selectedArea == SelectedArea.DIRS) {
+			if (selectedItem == 0) {
+				controller.navigateUp();
+			}
+			else {
+				int selectedChildDir = selectedItem - 1;
+				controller.navigate(controller.getChildDirsInCurrentDir().get(selectedChildDir));
+			}
+			
+			selectedArea = SelectedArea.DIRS;
+			selectedItem = 0;
+		}
+		else if (selectedArea == SelectedArea.SONGS) {
+			controller.playSong(controller.getSongsInCurrentDir().get(selectedItem));
+		}
 	}
 	
 	private void handleStart() {
@@ -142,11 +238,11 @@ public class LocalBrowser {
 	}
 	
 	private void handleUp() {
-		
+		moveCursorUp();
 	}
 	
 	private void handleDown() {
-		
+		moveCursorDown();
 	}
 	
 	private void handleLeft() {
