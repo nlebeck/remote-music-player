@@ -27,12 +27,12 @@ public class LocalBrowser {
 		DIRS, SONGS
 	}
 	
-	private static final int LEFT_COLUMN_WIDTH = 320;
-	private static final int HEADER_FONT_SIZE = 20;
-	private static final int NORMAL_FONT_SIZE = 12;
+	private static final int LEFT_COLUMN_WIDTH = 480;
+	private static final int HEADER_FONT_SIZE = 32;
+	private static final int NORMAL_FONT_SIZE = 16;
 	
-	private static final int NUM_VISIBLE_DIR_ITEMS = 20;
-	private static final int NUM_VISIBLE_SONG_ITEMS = 20;
+	private static final int NUM_VISIBLE_DIR_ITEMS = 14;
+	private static final int NUM_VISIBLE_SONG_ITEMS = 14;
 	
 	private Scene scene;
 	private Controller controller;
