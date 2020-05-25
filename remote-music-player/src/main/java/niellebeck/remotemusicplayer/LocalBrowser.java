@@ -102,7 +102,7 @@ public class LocalBrowser {
 	}
 	
 	// Called on the LocalBrowser's background thread
-	public synchronized void update() {
+	public void update() {
 		checkForDirectoryChange();
 		
 		if (device != null && device.poll()) {
@@ -148,7 +148,7 @@ public class LocalBrowser {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				drawDisplay();
+				drawDisplay(controller.getStateSnapshot());
 			}
 		});
 	}
@@ -161,26 +161,26 @@ public class LocalBrowser {
 	}
 	
 	// Called on the JavaFX Application Thread
-	private synchronized void drawDisplay() {
+	private void drawDisplay(Controller.ControllerState snapshot) {
 		GridPane gridPane = new GridPane();
 		gridPane.getColumnConstraints().add(new ColumnConstraints(LEFT_COLUMN_WIDTH));
 		
 		int currentRow = 0;
 
 		gridPane.add(createHeaderLabel("Status"), 0, currentRow++, 2, 1);
-		gridPane.add(createNormalLabel(controller.songIsPaused() ? "Paused" : "Unpaused"), 0, currentRow++, 2, 1);
-		gridPane.add(createNormalLabel("Volume: " + String.format("%.2f", controller.getVolume())), 0, currentRow++, 2, 1);
-		gridPane.add(createNormalLabel("Current directory: " + controller.getCurrentRelativeDir()), 0, currentRow++, 2, 1);
-		gridPane.add(createNormalLabel("Current song: " + controller.getCurrentSong()), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel(snapshot.paused ? "Paused" : "Unpaused"), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Volume: " + String.format("%.2f", snapshot.volume)), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Current directory: " + snapshot.currentRelativeDir), 0, currentRow++, 2, 1);
+		gridPane.add(createNormalLabel("Current song: " + snapshot.currentSong), 0, currentRow++, 2, 1);
 		
 		int twoColumnStartRow = currentRow;
 		
 		gridPane.add(createHeaderLabel("Navigation"), 0, currentRow++);
 		
 		// Start of labels in DIR area
-		int maxVisibleDirItem = Math.min(minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1, getNumItemsInDirsArea() - 1);
+		int maxVisibleDirItem = Math.min(minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1, getNumItemsInDirsAreaFromSnapshot(snapshot) - 1);
 		for (int i = minVisibleDirItem; i <= maxVisibleDirItem; i++) {
-			Label dirLabel = createNormalLabel(getDirItem(i));
+			Label dirLabel = createNormalLabel(getDirItemFromSnapshot(snapshot, i));
 			underlineIfSelectedDir(dirLabel, i);
 			gridPane.add(dirLabel, 0, currentRow++);
 		}
@@ -191,9 +191,9 @@ public class LocalBrowser {
 		gridPane.add(createHeaderLabel("Songs"), 1, currentRow++);
 		
 		// Start of labels in SONGS area
-		int maxVisibleSongItem = Math.min(minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1, getNumItemsInSongsArea() - 1);
+		int maxVisibleSongItem = Math.min(minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1, getNumItemsInSongsAreaFromSnapshot(snapshot) - 1);
 		for (int i = minVisibleSongItem; i <= maxVisibleSongItem; i++) {
-			Label songLabel = createNormalLabel(getSongItem(i));
+			Label songLabel = createNormalLabel(getSongItemFromSnapshot(snapshot, i));
 			underlineIfSelectedSong(songLabel, i);
 			gridPane.add(songLabel, 1, currentRow++);
 		}
@@ -238,12 +238,16 @@ public class LocalBrowser {
 		return controller.getChildDirsInCurrentDir().size() + 1;
 	}
 	
-	private String getDirItem(int index) {
+	private int getNumItemsInDirsAreaFromSnapshot(Controller.ControllerState snapshot) {
+		return snapshot.childDirs.size() + 1;
+	}
+	
+	private String getDirItemFromSnapshot(Controller.ControllerState snapshot, int index) {
 		if (index == 0) {
 			return "Up";
 		}
 		else {
-			return controller.getChildDirsInCurrentDir().get(index - 1);
+			return snapshot.childDirs.get(index - 1);
 		}
 	}
 	
@@ -258,13 +262,17 @@ public class LocalBrowser {
 		
 		resetSelection();
 	}
-	
+
 	private int getNumItemsInSongsArea() {
 		return controller.getSongsInCurrentDir().size();
 	}
 	
-	private String getSongItem(int index) {
-		return controller.getSongsInCurrentDir().get(index);
+	private int getNumItemsInSongsAreaFromSnapshot(Controller.ControllerState snapshot) {
+		return snapshot.songs.size();
+	}
+	
+	private String getSongItemFromSnapshot(Controller.ControllerState snapshot, int index) {
+		return snapshot.songs.get(index);
 	}
 	
 	private void handleSongItemAction(int index) {

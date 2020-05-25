@@ -10,6 +10,15 @@ import java.util.List;
  */
 public class Controller {
 
+	public static class ControllerState {
+		public boolean paused;
+		public double volume;
+		public String currentRelativeDir;
+		public String currentSong;
+		public List<String> childDirs;
+		public List<String> songs;
+	}
+	
 	private static final double VOLUME_MIN = 0.0;
 	private static final double VOLUME_MAX = 0.6;
 	private static final double VOLUME_DELTA = 0.05;
@@ -48,6 +57,17 @@ public class Controller {
 	public Controller(String baseDir, String[] musicFileTypes) {
 		this.baseDir = baseDir;
 		this.musicFileTypes = musicFileTypes;
+	}
+	
+	public synchronized ControllerState getStateSnapshot() {
+		ControllerState snapshot = new ControllerState();
+		snapshot.paused = songIsPaused();
+		snapshot.volume = getVolume();
+		snapshot.currentRelativeDir = getCurrentRelativeDir();
+		snapshot.currentSong = getCurrentSong();
+		snapshot.childDirs = new ArrayList<String>(getChildDirsInCurrentDir());
+		snapshot.songs = new ArrayList<String>(getSongsInCurrentDir());
+		return snapshot;
 	}
 	
 	private synchronized void changeSong(String songName, String relativeDir) {
