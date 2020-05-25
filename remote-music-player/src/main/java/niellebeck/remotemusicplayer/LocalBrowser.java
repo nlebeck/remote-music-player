@@ -362,23 +362,23 @@ public class LocalBrowser {
 	}
 	
 	private void handleLeft() {
-		controller.playPrevSong();
-	}
-	
-	private void handleRight() {
-		controller.playNextSong();
-	}
-	
-	private void handleLeftShoulder() {
 		selectedArea = SelectedArea.DIRS;
 		selectedItem = 0;
 	}
 	
-	private void handleRightShoulder() {
+	private void handleRight() {
 		if (getNumItemsInSongsArea() > 0) {
 			selectedArea = SelectedArea.SONGS;
 			selectedItem = 0;
 		}
+	}
+	
+	private void handleLeftShoulder() {
+		controller.playPrevSong();
+	}
+	
+	private void handleRightShoulder() {
+		controller.playNextSong();
 	}
 	
 }
