@@ -41,7 +41,8 @@ public class LocalBrowser {
 	private volatile boolean shouldStop;
 	
 	private SelectedArea selectedArea;
-	private int selectedItem;
+	private int selectedDirItem;
+	private int selectedSongItem;
 	
 	private int minVisibleDirItem;
 	private int minVisibleSongItem;
@@ -55,7 +56,8 @@ public class LocalBrowser {
 		shouldStop = false;
 		
 		selectedArea = SelectedArea.DIRS;
-		selectedItem = 0;
+		selectedDirItem = 0;
+		selectedSongItem = 0;
 		
 		minVisibleDirItem = 0;
 		minVisibleSongItem = 0;
@@ -227,11 +229,11 @@ public class LocalBrowser {
 	}
 	
 	private boolean isSelectedDir(int currentDirItem) {
-		return selectedArea == SelectedArea.DIRS && selectedItem == currentDirItem;
+		return selectedArea == SelectedArea.DIRS && selectedDirItem == currentDirItem;
 	}
 	
 	private boolean isSelectedSong(int currentSongItem) {
-		return selectedArea == SelectedArea.SONGS && selectedItem == currentSongItem;
+		return selectedArea == SelectedArea.SONGS && selectedSongItem == currentSongItem;
 	}
 	
 	private int getNumItemsInDirsArea() {
@@ -252,11 +254,11 @@ public class LocalBrowser {
 	}
 	
 	private void handleDirItemAction(int index) {
-		if (selectedItem == 0) {
+		if (selectedDirItem == 0) {
 			controller.navigateUp();
 		}
 		else {
-			int selectedChildDir = selectedItem - 1;
+			int selectedChildDir = selectedDirItem - 1;
 			controller.navigate(controller.getChildDirsInCurrentDir().get(selectedChildDir));
 		}
 		
@@ -281,47 +283,50 @@ public class LocalBrowser {
 	
 	private void resetSelection() {
 		selectedArea = SelectedArea.DIRS;
-		selectedItem = 0;
+		selectedDirItem = 0;
+		selectedSongItem = 0;
 		
 		minVisibleDirItem = 0;
 		minVisibleSongItem = 0;
 	}
 	
 	private void moveCursorDown() {
-		selectedItem++;
 		if (selectedArea == SelectedArea.DIRS) {
-			if (selectedItem >= getNumItemsInDirsArea()) {
-				selectedItem = getNumItemsInDirsArea() - 1;
+			selectedDirItem++;
+			if (selectedDirItem >= getNumItemsInDirsArea()) {
+				selectedDirItem = getNumItemsInDirsArea() - 1;
 			}
-			if (selectedItem > minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1) {
+			if (selectedDirItem > minVisibleDirItem + NUM_VISIBLE_DIR_ITEMS - 1) {
 				minVisibleDirItem++;
 			}
 		}
 		else if (selectedArea == SelectedArea.SONGS) {
-			if (selectedItem >= getNumItemsInSongsArea()) {
-				selectedItem = getNumItemsInSongsArea() - 1;
+			selectedSongItem++;
+			if (selectedSongItem >= getNumItemsInSongsArea()) {
+				selectedSongItem = getNumItemsInSongsArea() - 1;
 			}
-			if (selectedItem > minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1) {
+			if (selectedSongItem > minVisibleSongItem + NUM_VISIBLE_SONG_ITEMS - 1) {
 				minVisibleSongItem++;
 			}
 		}
 	}
 	
 	private void moveCursorUp() {
-		selectedItem--;
 		if (selectedArea == SelectedArea.DIRS) {
-			if (selectedItem < 0) {
-				selectedItem = 0;
+			selectedDirItem--;
+			if (selectedDirItem < 0) {
+				selectedDirItem = 0;
 			}
-			if (selectedItem < minVisibleDirItem) {
+			if (selectedDirItem < minVisibleDirItem) {
 				minVisibleDirItem--;
 			}
 		}
 		else if (selectedArea == SelectedArea.SONGS) {
-			if (selectedItem < 0) {
-				selectedItem = 0;
+			selectedSongItem--;
+			if (selectedSongItem < 0) {
+				selectedSongItem = 0;
 			}
-			if (selectedItem < minVisibleSongItem) {
+			if (selectedSongItem < minVisibleSongItem) {
 				minVisibleSongItem--;
 			}
 		}
@@ -329,10 +334,10 @@ public class LocalBrowser {
 	
 	private void handleA() {
 		if (selectedArea == SelectedArea.DIRS) {
-			handleDirItemAction(selectedItem);
+			handleDirItemAction(selectedDirItem);
 		}
 		else if (selectedArea == SelectedArea.SONGS) {
-			handleSongItemAction(selectedItem);
+			handleSongItemAction(selectedSongItem);
 		}
 	}
 	
@@ -363,13 +368,11 @@ public class LocalBrowser {
 	
 	private void handleLeft() {
 		selectedArea = SelectedArea.DIRS;
-		selectedItem = 0;
 	}
 	
 	private void handleRight() {
 		if (getNumItemsInSongsArea() > 0) {
 			selectedArea = SelectedArea.SONGS;
-			selectedItem = 0;
 		}
 	}
 	
