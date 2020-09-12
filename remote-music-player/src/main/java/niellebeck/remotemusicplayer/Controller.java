@@ -2,6 +2,7 @@ package niellebeck.remotemusicplayer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -184,6 +185,7 @@ public class Controller {
 		List<String> songs = new ArrayList<String>();
 		File currentDirFile = new File(baseDir + File.separator + relativeDir);
 		String[] children = currentDirFile.list();
+		Arrays.sort(children);
 		for (String child : children) {
 			String childPath = baseDir + File.separator + relativeDir + File.separator + child;
 			File childFile = new File(childPath);
@@ -198,6 +200,7 @@ public class Controller {
 		List<String> childDirs = new ArrayList<String>();
 		File currentDirFile = new File(baseDir + File.separator + currentRelativeDir);
 		String[] children = currentDirFile.list();
+		Arrays.sort(children);
 		for (String child : children) {
 			String childPath = baseDir + File.separator + currentRelativeDir + File.separator + child;
 			File childFile = new File(childPath);
