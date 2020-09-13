@@ -62,4 +62,11 @@ public class ConfigFileParser {
 				.getTextContent();
 		return Integer.parseInt(portString);
 	}
+
+	public boolean getEnableLocalBrowser() {
+		String valueString = configFileDoc.getElementsByTagName("enableLocalBrowser")
+				.item(0)
+				.getTextContent();
+		return Boolean.parseBoolean(valueString);
+	}
 }

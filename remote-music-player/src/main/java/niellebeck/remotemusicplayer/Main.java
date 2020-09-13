@@ -51,6 +51,7 @@ public class Main extends Application {
 		String[] musicFileTypes = config.getMusicFileTypes();
 		int httpPort = config.getHttpPort();
 		int webSocketPort = config.getWebSocketPort();
+		boolean enableLocalBrowser = config.getEnableLocalBrowser();
 		
 		String ipAddress = null;
 		try {
@@ -77,8 +78,11 @@ public class Main extends Application {
 		playerThread.setDaemon(true);
 		playerThread.start();
 		
-		localBrowser = new LocalBrowser(scene, controller);
-		localBrowser.start();
+		localBrowser = null;
+		if (enableLocalBrowser) {
+			localBrowser = new LocalBrowser(scene, controller);
+			localBrowser.start();
+		}
 	}
 
 	@Override
@@ -86,7 +90,9 @@ public class Main extends Application {
 		try {
 			jettyServer.stop();
 			webSocketServer.stop();
-			localBrowser.stop();
+			if (localBrowser != null) {
+				localBrowser.stop();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

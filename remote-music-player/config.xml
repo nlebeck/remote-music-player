@@ -3,4 +3,5 @@
   <musicFileTypes>mp3,m4a</musicFileTypes>
   <httpPort>8080</httpPort>
   <webSocketPort>8081</webSocketPort>
+  <enableLocalBrowser>true</enableLocalBrowser>
 </configuration>
