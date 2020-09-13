@@ -27,15 +27,21 @@ public class PlayerRunnable implements Runnable {
 				File file = new File(newSongPath);
 				Media media = new Media(file.toURI().toString());
 				player = new MediaPlayer(media);
+				final MediaPlayer playerAlias = player;
 				
 				/*
 				 * This StackOverflow answer told me how to detect when the
 				 * MediaPlayer is done playing a song:
 				 * https://stackoverflow.com/a/50499105.
+				 * 
+				 * This StackOverflow answer suggested disposing of the
+				 * MediaPlayer in its OnEndOfMedia callback:
+				 * https://stackoverflow.com/a/37608031.
 				 */
 				player.setOnEndOfMedia(new Runnable() {
 					public void run() {
 						controller.reportSongDone();
+						playerAlias.dispose();
 					}
 				});
 				
