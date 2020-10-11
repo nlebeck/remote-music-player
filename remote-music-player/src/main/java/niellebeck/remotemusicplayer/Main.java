@@ -36,6 +36,14 @@ public class Main extends Application {
 	private LocalBrowser localBrowser;
 
 	public static void main(String[] args) {
+		// I learned how to catch exceptions thrown from threads here:
+		// https://stackoverflow.com/a/6548203.
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+		    @Override
+		    public void uncaughtException(Thread t, Throwable e) {
+			    e.printStackTrace();
+		    }
+		});
 		launch();
 	}
 
